@@ -4,48 +4,66 @@ CHANGES
 1.1
 ---
 
-Major package dependencies ave been up dated to more recent releases. These include
+Package Updates
++++++++++++++++
 
-- Python: Python 2.7 has dropped and Python 3.6-3.8 is now supported.
+All major packages that Mathics needs have been updated for more recent
+releases. Specifically These include:
+
+- Python: Python 3.6-3.8 is now supported.
 - sympy 1.6.2
+- cython >= 0.15.1
+- Django 3.1.x
 
 
-New features:
+New features (50+ builtins):
+++++++++++++++++++++++++++++
 
-- ``IterationLimit``
-- support for ``MATHICS_MAX_RECURSION_DEPTH``
-- ``RemoveDiacritics[]``, ``Transliterate[]`` #617
-- ``Speedups by avoiding inner classes``, #616
-- ``CharacterEncoding`` option for ``Import[]``
-- ``BooleanQ``, ``DigitQ`` and ``LetterQ``
-- ``StringRiffle[]``, ``StringFreeQ[]``, ``StringContainsQ[]``, ``StringInsert``
-- ``PolynomialQ[]``, ``MinimalPolynomial[]``
-- ``Coefficient[]``, ``Coefficient[x * y, z, 0]``, ``Coefficient*[]``,
-- ``Sign[]``, ``Exponent``, ``Divisors``, ``QuotientRemainder``, ``FactorTermsList``
-- ``RealDigits`` #891, #691, ``Interrupt``, ``Unique``
 - ``Association``, ``AssociationQ``, ``FirstPostion``, ``LeafCount``
-- ``FirstPostions``, ``Integers``, ``PrePendTo[]``
-- ``Integers``, ``PrependTo`` and ``ContainsOnly``
-- ``MantissaExponent[]``, ``FractionalPart[]``, ``CubeRoot[]``
-- ``Quit[]``, ``Exit[]`` #523, #814,
-- ``Root`` #806
 - ``Association``, ``AssociationQ``, ``Keys``, ``Values`` #705
-- ``SubsetQ`` and ``Delete[]`` #688, #784,
-- ``randchoice`` option for ``NoNumPyRandomEnv`` #820
 - ``BarChart[]``, ``PieChart``, ``Histogram``, ``DensityPlot`` #499
-- option ``--full-form`` (``-F``) on ``mathics`` to parsed ``FullForm`` of input expressions
+- ``BooleanQ``, ``DigitQ`` and ``LetterQ``
+- ``CharacterEncoding`` option for ``Import[]``
+- ``Coefficient[]``, ``Coefficient[x * y, z, 0]``, ``Coefficient*[]``,
+- ``DiscreteLimit`` #922
 - ``Environment``
-- ``System`Byteordering`` ``System`Environemnt`` #859
+-   File read operations from URLs
+- ``FirstPostions``, ``Integers``, ``PrePendTo[]``
+- ``GetEnvironment`` # 938
+- ``Integers``, ``PrependTo`` and ``ContainsOnly``
+- ``Import`` support for WL packages
+- ``IterationLimit``
+- ``LoadModule``
+- ``MantissaExponent[]``, ``FractionalPart[]``, ``CubeRoot[]``
+- ``PolynomialQ[]``, ``MinimalPolynomial[]``
+- ``Quit[]``, ``Exit[]`` #523, #814,
+- ``RealDigits`` #891, #691, ``Interrupt``, ``Unique``
+- ``RemoveDiacritics[]``, ``Transliterate[]`` #617
+- ``Root`` #806
+- ``Sign[]``, ``Exponent``, ``Divisors``, ``QuotientRemainder``, ``FactorTermsList``
+- ``Speedups by avoiding inner classes``, #616
+- ``StringRiffle[]``, ``StringFreeQ[]``, ``StringContainsQ[]``, ``StringInsert``
+- ``SubsetQ`` and ``Delete[]`` #688, #784,
+- ``Subsets`` #685
 - ``SystemTimeZone`` and correct ``TimeZone`` #924
+- ``System\`Byteordering`` and ``System\`Environemnt`` #859
+- ``$UseSansSerif`` #908
+- ``randchoice`` option for ``NoNumPyRandomEnv`` #820
+
+- support for ``MATHICS_MAX_RECURSION_DEPTH``
+- option ``--full-form`` (``-F``) on ``mathics`` to parsed ``FullForm`` of input expressions
 
 Ehancements and Bug fixes:
++++++++++++++++++++++++++++
 
+- speed up leading-blank patterns #625, #933
+- support for iteration over Sequence objects in Table, Sum, and Product 
 - fixes for option handling
 - fixes for ``Manipulate[x,{x,{a,b}}]``
 - fixes rule -> rule case for ``Nearest``
 - fixes and enhancements to ``WordCloud``
 - added ``StringTrim[]``
-- fixes ``FetchURL`` options
+- fixes ``URLFetch`` options
 - fixes ``XMLGetString`` and parse error
 - fixes ``LanguageIdentify``
 - fixes 2 <= base <= 36 in number parsing
@@ -63,20 +81,45 @@ Ehancements and Bug fixes:
 
 Mathematica tracking changes:
 
+- renamed ``FetchURL`` to ``URLFetch`` (according to the WL standard)
 - renamed ``SymbolLookup`` to ``Lookup``
 
 Performance improvements:
++++++++++++++++++++++++++
 
 - Speed up pattern matching for large lists
+- Quadraditc speed improvement in pattern matching. #619 and see the graph comparisons there
 - In-memory sessions #623
 
 Other Changes:
+++++++++++++++
 
 - bump ``RecursionLimit``
 - blacken (format) a number of Python files and remove blanks at the end of lines
+- Adding several CI tests
 - Remove various deprecation warnings
 - Change shbang from ``python`` to ``python3``
 - Update docs
+
+Backward incompatablities:
+++++++++++++++++++++++++++
+
+- Support for Python 3.5 and earlier, and in particular Python 2.7,
+  has dropped
+- The `graphs` module (for Graphs) has been pulled until Mathics
+  supports pymathics and graphics using networkx better. It will
+  reappear as a pymathics module.
+- The `natlang` (for Natural Language processing) has also been
+  pulled.  The problem here too is that the pymathics mechanism needs
+  a small amount of work to make it scalable, and in 1.0 these were
+  hard coded. Also, both this module and `graphs` pulled in some
+  potentially hard-to-satisfy non-Python dependencies such as
+  matplotlib, or NLP libraries, and word lists. All of this made
+  installation of mathics harder, and the import of these libraries,
+  `natlang` in particular took some time. All of this points to having
+  these live in their own repositories and get imported on laziliy on
+  demand
+
 
 
 1.0

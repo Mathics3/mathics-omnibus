@@ -36,6 +36,7 @@ def get_symbol_list(list, error_callback):
 class _SetOperator(object):
     def assign_elementary(self, lhs, rhs, evaluation, tags=None, upset=False):
         name = lhs.get_head_name()
+        lhs._format_cache = None
 
         if name in system_symbols('OwnValues', 'DownValues', 'SubValues',
                                   'UpValues', 'NValues', 'Options',
@@ -217,7 +218,9 @@ class _SetOperator(object):
             ignore_protection = True
             return True
         elif lhs_name == 'System`$ContextPath':
-            context_path = [s.get_string_value() for s in rhs.get_leaves()]
+            currContext = evaluation.definitions.get_current_context()
+            context_path = [s.get_string_value()  for s in rhs.get_leaves()]
+            context_path = [s if (s is None or s[0]!="`") else currContext +s for s in context_path]
             if rhs.has_form('List', None) and all(valid_context_name(s) for s in context_path):
                 evaluation.definitions.set_context_path(context_path)
                 ignore_protection = True
@@ -290,6 +293,7 @@ class _SetOperator(object):
         return True
 
     def assign(self, lhs, rhs, evaluation):
+        lhs._format_cache = None
         if lhs.get_head_name() == 'System`List':
             if (not (rhs.get_head_name() == 'System`List') or
                 len(lhs.leaves) != len(rhs.leaves)):    # nopep8
@@ -837,12 +841,8 @@ class Information(PrefixOperator):
     >> f[x_] := x ^ 2
     >> g[f] ^:= 2
     >> f::usage = "f[x] returns the square of x";
-    >> Information[f]
+    X> Information[f]
      = f[x] returns the square of x
-     .
-     . f[x_] = x ^ 2
-     .
-     . g[f] ^= 2
 
     >> ? Table
      = 
@@ -916,7 +916,6 @@ class Information(PrefixOperator):
         # Instead, I just copy the code from Definition
 
     def show_definitions(self, symbol, evaluation, lines):
-
         def print_rule(rule, up=False, lhs=lambda l: l, rhs=lambda r: r):
             evaluation.check_stopped()
             if isinstance(rule, Rule):
@@ -1061,6 +1060,12 @@ class Clear(Builtin):
 
         return Symbol('Null')
 
+    def apply_all(self, evaluation):
+        'Clear[System`All]'
+        evaluation.definitions.set_user_definitions({})
+        evaluation.definitions.clear_pymathics_modules()
+        return
+
 
 class ClearAll(Clear):
     """
@@ -1093,6 +1098,12 @@ class ClearAll(Clear):
         definition.messages = []
         definition.options = []
         definition.defaultvalues = []
+
+    def apply_all(self, evaluation):
+        'ClearAll[System`All]'
+        evaluation.definitions.set_user_definitions({})
+        evaluation.definitions.clear_pymathics_modules()
+        return
 
 
 class Unset(PostfixOperator):
@@ -1206,33 +1217,6 @@ class Unset(PostfixOperator):
         return Symbol('Null')
 
 
-class Quit(Builtin):
-    """
-    <dl>
-    <dt>'Quit'[]
-        <dd>removes all user-defined definitions.
-    </dl>
-
-    >> a = 3
-     = 3
-    >> Quit[]
-    >> a
-     = a
-
-    'Quit' even removes the definitions of protected and locked symbols:
-    >> x = 5;
-    >> Attributes[x] = {Locked, Protected};
-    >> Quit[]
-    >> x
-     = x
-    """
-
-    def apply(self, evaluation):
-        'Quit[]'
-        evaluation.definitions.set_user_definitions({})
-        evaluation.definitions.clear_pymathics_modules()
-        return Symbol('Null')
-
 
 def get_symbol_values(symbol, func_name, position, evaluation):
     name = symbol.get_name()
@@ -1243,7 +1227,7 @@ def get_symbol_values(symbol, func_name, position, evaluation):
         definition = evaluation.definitions.get_definition(name)
     else:
         definition = evaluation.definitions.get_user_definition(name)
-    result = Expression('List')
+    leaves = []
     for rule in definition.get_values_list(position):
         if isinstance(rule, Rule):
             pattern = rule.pattern
@@ -1251,9 +1235,9 @@ def get_symbol_values(symbol, func_name, position, evaluation):
                 pattern = pattern.expr
             else:
                 pattern = Expression('HoldPattern', pattern.expr)
-            result.leaves.append(Expression(
+            leaves.append(Expression(
                 'RuleDelayed', pattern, rule.replace))
-    return result
+    return Expression('List', *leaves)
 
 
 class DownValues(Builtin):
@@ -1656,9 +1640,9 @@ class Decrement(PostfixOperator):
     </dl>
 
     >> a = 5;
-    >> a--
+    X> a--
      = 5
-    >> a
+    X> a
      = 4
     """
 

@@ -20,7 +20,10 @@ import sympy
 import requests
 import tempfile
 
- 
+
+from itertools import chain
+
+
 from mathics.core.expression import (Expression, Real, Complex, String, Symbol,
                                      from_python, Integer, BoxError,
                                      MachineReal, Number, valid_context_name)
@@ -61,9 +64,18 @@ def path_search(filename):
         if (lenfn>7 and filename[:7]=="http://") or \
            (lenfn>8 and filename[:8]=="https://") or \
            (lenfn>6 and filename[:6]=="ftp://"):
+            suffix = ""
+            strip_filename = filename.split("/")
+            if len(strip_filename) > 3:
+                strip_filename = strip_filename[-1]
+                if strip_filename != "":
+                    suffix = strip_filename[len(strip_filename.split(".")[0]):]
             try:
                 r = requests.get(filename, allow_redirects=True)
-                fp = tempfile.NamedTemporaryFile(delete=False)
+                if suffix != "":
+                    fp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+                else:
+                    fp = tempfile.NamedTemporaryFile(delete=False)
                 fp.write(r.content)
                 result = fp.name
                 fp.close()
@@ -286,7 +298,7 @@ class Input(Predefined):
     </dl>
 
     >> $Input
-     = 
+     = #<--#
     """
 
     attributes = ('Protected', 'ReadProtected')
@@ -306,7 +318,7 @@ class InputFileName(Predefined):
 
     While in interactive mode, '$InputFileName' is "".
     >> $InputFileName
-     = 
+     = #<--#
     """
 
     name = '$InputFileName'
@@ -1501,17 +1513,17 @@ class BinaryWrite(Builtin):
             elif t.startswith('Character'):
                 if isinstance(x, Integer):
                     x = [String(char) for char in str(x.get_int_value())]
-                    pyb = pyb[:i] + x + pyb[i + 1:]
+                    pyb = list(chain(pyb[:i], x, pyb[i + 1:]))
                     x = pyb[i]
                 if isinstance(x, String) and len(x.get_string_value()) > 1:
                     x = [String(char) for char in x.get_string_value()]
-                    pyb = pyb[:i] + x + pyb[i + 1:]
+                    pyb = list(chain(pyb[:i], x, pyb[i + 1:]))
                     x = pyb[i]
                 x = x.get_string_value()
             elif t == 'Byte' and isinstance(x, String):
                 if len(x.get_string_value()) > 1:
                     x = [String(char) for char in x.get_string_value()]
-                    pyb = pyb[:i] + x + pyb[i + 1:]
+                    pyb = list(chain(pyb[:i], x, pyb[i + 1:]))
                     x = pyb[i]
                 x = ord(x.get_string_value())
             else:
@@ -2009,9 +2021,9 @@ class OpenRead(_OpenAction):
      = InputStream[...]
     #> Close[%];
 
-    >> OpenRead["https://raw.githubusercontent.com/mathics/Mathics/master/README.rst"]
+    S> OpenRead["https://raw.githubusercontent.com/mathics/Mathics/master/README.rst"]
      = InputStream[...]
-    #> Close[%];
+    S> Close[%];
 
     #> OpenRead[]
      : OpenRead called with 0 arguments; 1 argument is expected.
@@ -2082,25 +2094,20 @@ class OpenAppend(_OpenAction):
 class Get(PrefixOperator):
     r"""
     <dl>
-    <dt>'<<name'
+    <dt>'<<$name$'
       <dd>reads a file and evaluates each expression, returning only the last one.
     </dl>
 
-    >> Put[x + y, "example_file"]
-    >> <<"example_file"
+    S> filename = $TemporaryDirectory <> "/example_file";
+    S> Put[x + y, filename]
+    S> Get[filename]
      = x + y
 
-    >> Put[x + y, 2x^2 + 4z!, Cos[x] + I Sin[x], "example_file"]
-    >> <<"example_file"
+    S> filename = $TemporaryDirectory <> "/example_file";
+    S> Put[x + y, 2x^2 + 4z!, Cos[x] + I Sin[x], filename]
+    S> Get["/tmp/example_file"]
      = Cos[x] + I Sin[x]
-    #> DeleteFile["example_file"]
-
-    >> 40! >> "fourtyfactorial"
-    >> FilePrint["fourtyfactorial"]
-     | 815915283247897734345611269596115894272000000000
-    >> <<"fourtyfactorial"
-     = 815915283247897734345611269596115894272000000000
-    #> DeleteFile["fourtyfactorial"]
+    S> DeleteFile[filename]
 
     ## TODO: Requires EndPackage implemented
     ## 'Get' can also load packages:
@@ -2160,57 +2167,62 @@ class Put(BinaryOperator):
     <dl>
     <dt>'$expr$ >> $filename$'
       <dd>write $expr$ to a file.
-    <dt>'Put[$expr1$, $expr2$, ..., $"filename"$]'
+    <dt>'Put[$expr1$, $expr2$, ..., $filename$]'
       <dd>write a sequence of expressions to a file.
     </dl>
 
-    >> 40! >> "fourtyfactorial"
-    >> FilePrint["fourtyfactorial"]
-     | 815915283247897734345611269596115894272000000000
-    #> 40! >> fourtyfactorial
-    #> FilePrint["fourtyfactorial"]
-     | 815915283247897734345611269596115894272000000000
+    ## Note a lot of these tests are:
+    ## * a bit fragile, somewhat
+    ## * somewhat OS dependent,
+    ## * can leave crap in the filesystem
+    ##
+    ## For these reasons this should be done a a pure test
+    ## rather than intermingled with the doc system.
 
-    #> Put[40!, fourtyfactorial]
-     : fourtyfactorial is not string, InputStream[], or OutputStream[]
-     = 815915283247897734345611269596115894272000000000 >> fourtyfactorial
+    S> Put[40!, fortyfactorial]
+     : fortyfactorial is not string, InputStream[], or OutputStream[]
+     = 815915283247897734345611269596115894272000000000 >> fortyfactorial
     ## FIXME: final line should be
-    ## = Put[815915283247897734345611269596115894272000000000, fourtyfactorial]
-    #> DeleteFile["fourtyfactorial"]
+    ## = Put[815915283247897734345611269596115894272000000000, fortyfactorial]
 
-    >> Put[50!, "fiftyfactorial"]
-    >> FilePrint["fiftyfactorial"]
-     | 30414093201713378043612608166064768844377641568960512000000000000
-    #> DeleteFile["fiftyfactorial"]
+    S> filename = $TemporaryDirectory <> "/fortyfactorial";
+    S> Put[40!, filename]  
+    S> FilePrint[filename]
+     | 815915283247897734345611269596115894272000000000
+    S> Get[filename]
+     = 815915283247897734345611269596115894272000000000
+    #> DeleteFile[filename]
 
-    >> Put[10!, 20!, 30!, "factorials"]
-    >> FilePrint["factorials"]
+    S> filename = $TemporaryDirectory <> "/fiftyfactorial";
+    S> Put[10!, 20!, 30!, filename]
+    S> FilePrint[filename]
      | 3628800
      | 2432902008176640000
      | 265252859812191058636308480000000
 
-    #> DeleteFile["factorials"]
+    S> DeleteFile[filename]
      =
 
-    #> Put[x + y, 2x^2 + 4z!, Cos[x] + I Sin[x], "example_file"]
-    #> FilePrint["example_file"]
+    S> filename = $TemporaryDirectory <> "/example_file";
+    S> Put[x + y, 2x^2 + 4z!, Cos[x] + I Sin[x], filename]
+    S> FilePrint[filename]
      | x + y
      | 2*x^2 + 4*z!
      | Cos[x] + I*Sin[x]
-    #> DeleteFile["example_file"]
+    S> DeleteFile[filename]
 
     ## writing to dir
-    #> x >> /var/
+    S> x >> /var/
      : Cannot open /var/.
      = x >> /var/
 
     ## writing to read only file
-    #> x >> /proc/uptime
+    S> x >> /proc/uptime
      : Cannot open /proc/uptime.
      = x >> /proc/uptime
 
     ## writing to full file
-    #> x >> /dev/full
+    S> x >> /dev/full
      : No space left on device.
     """
 
@@ -2547,9 +2559,9 @@ class FileExtension(Builtin):
      = gz
 
     #> FileExtension["file."]
-     = 
+     = #<--#
     #> FileExtension["file"]
-     = 
+     = #<--#
     """
 
     attributes = ('Protected')
@@ -3998,9 +4010,9 @@ class CopyFile(Builtin):
       <dd>copies $file1$ to $file2$.
     </dl>
 
-    >> CopyFile["ExampleData/sunflowers.jpg", "MathicsSunflowers.jpg"]
+    X> CopyFile["ExampleData/sunflowers.jpg", "MathicsSunflowers.jpg"]
      = MathicsSunflowers.jpg
-    >> DeleteFile["MathicsSunflowers.jpg"]
+    X> DeleteFile["MathicsSunflowers.jpg"]
     """
 
     messages = {
@@ -4258,7 +4270,7 @@ class SetDirectory(Builtin):
       <dd>sets the current working directory to $dir$.
     </dl>
 
-    >> SetDirectory[]
+    S> SetDirectory[]
     = ...
 
     #> SetDirectory["MathicsNonExample"]
@@ -4555,7 +4567,7 @@ class FileType(Builtin):
     """
     <dl>
     <dt>'FileType["$file$"]'
-      <dd>returns the type of a file, from 'File', 'Directory' or 'None'.
+      <dd>gives the type of a file, a string. This is typically 'File', 'Directory' or 'None'.
     </dl>
 
     >> FileType["ExampleData/sunflowers.jpg"]

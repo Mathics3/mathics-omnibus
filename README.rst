@@ -1,15 +1,18 @@
 Welcome to Mathics!
 ===================
 
-|Travis|_ |SlackStatus|_
+|Travis|_ |SlackStatus|_ |PyPI|_
 
 Mathics is a general-purpose computer algebra system (CAS). It is an open-source alternative to Mathematica. It is free both as in "free beer" and as in "freedom".
 
 The home page of Mathics is https://mathics.org.
 
-Installing
-----------
+Installing and Running
+----------------------
 
+<<<<<<< HEAD
+See the `wiki page <https://github.com/mathics/Mathics/wiki/Installing-and-Running>`_ for how to install and run.
+=======
 To install so that you run from the source tree:
 
 
@@ -50,12 +53,17 @@ To run the command-line interface using docker image:
 ::
    $ docker run --rm -it --name mathics-cli -v /tmp:/usr/src/app/data mathicsorg/mathics --mode cli
 
+If you want to add options add them at then end preceded with `--`: for example:
+::
+   $ docker run --rm -it --name mathics-cli -v /tmp:/usr/src/app/data mathicsorg/mathics --mode cli -- --help
+
 To run the Django web interface using docker image:
 ::
-   $docker run --rm -it --name mathics-web -p 8000:8000 -v /tmp:/usr/src/app/data mathicsorg/mathics --mode ui
+   $ docker run --rm -it --name mathics-web -p 8000:8000 -v /tmp:/usr/src/app/data mathicsorg/mathics --mode ui
 
 
-This dockeriztion was modified from `sealemar/mathics-dockerized <https://github.com/sealemar/mathics-dockerized>`_. See that for more details on how this works.
+This dockerization was modified from `sealemar/mathics-dockerized <https://github.com/sealemar/mathics-dockerized>`_. See that for more details on how this works.
+>>>>>>> 2813fe7c... Update README.rst
 
 Contributing
 ------------
@@ -66,6 +74,8 @@ Please feel encouraged to contribute to Mathics! Create your own fork, make the 
 .. _SlackStatus: https://mathics-slackin.herokuapp.com/
 .. |Travis| image:: https://secure.travis-ci.org/mathics/Mathics.svg?branch=master
 .. _Travis: https://travis-ci.org/mathics/Mathics
+.. |PyPI| image:: https://img.shields.io/pypi/v/Mathics
+.. _PyPI: https://pypi.org/project/Mathics/
 
 License
 -------

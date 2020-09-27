@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Patterns and rules
+Patterns and Rules
 
 Some examples:
 >> a + b + c /. a + b -> t
@@ -752,6 +752,9 @@ class Pattern_(PatternObject):
         if self.varname is None:
             self.error('patvar', expr)
         self.pattern = Pattern.create(expr.leaves[1])
+
+    def __repr__(self):
+        return '<Pattern: %s>' % repr(self.pattern)
 
     def get_match_count(self, vars={}):
         return self.pattern.get_match_count(vars)

@@ -9,12 +9,12 @@ PYTHON ?= python3
 PIP ?= pip3
 RM  ?= rm
 
-.PHONY: all build check clean develop dist doc pytest test rmChangeLog
+.PHONY: all build check clean develop dist doc doc-data gstest pytest test djangotest rmChangeLog
 
 #: Default target - same as "develop"
 all: develop
 
-#: build everything needed to install; (runs Cython)
+#: build everything needed to install
 build:
 	$(PYTHON) ./setup.py build
 
@@ -26,7 +26,11 @@ develop:
 install:
 	$(PYTHON) setup.py install
 
-check: pytest doctest
+#: Run Django-based server in development mode. Use environment variable "o" for manage options
+runserver:
+	$(PYTHON) mathics/manage.py runserver $o
+
+check: pytest doctest djangotest gstest
 
 #: Remove derived files
 clean:
@@ -35,24 +39,31 @@ clean:
 	   ($(MAKE) -C "$$dir" clean); \
 	done;
 
-#: Run py.test tests. You can set environment variable "o" for pytest options
+#: Run py.test tests. Use environment variable "o" for pytest options
 pytest:
 	py.test test $o
 
 
-#: Run mathics/test.py asking for output to build "mathics/doc/tex/data"
+#: Run a more extensive pattern-matching test
+gstest:
+	(cd examples/symbolic_logic/gries_schneider && ./test-gs.sh)
 
-mathics/doc/tex/data:
-	$(PYTHON) mathics/test.py -o
+
+#: Create data that is used to in Django docs and to build TeX PDF
+doc-data mathics/doc/tex/data: mathics/builtin/*.py mathics/doc/documentation/*.mdoc mathics/doc/documentation/images/*
+	$(PYTHON) mathics/test.py -ot -k
 
 #: Run tests that appear in docstring in the code.
 doctest:
-	$(PYTHON) mathics/test.py $(output)
+	$(PYTHON) mathics/test.py $o
+
+#: Run Django tests
+djangotest:
+	cd mathics && $(PYTHON) manage.py test test_django
 
 #: Make Mathics PDF manual
-doc: mathics/doc/tex/data
-	(cd mathics && $(PYTHON) test.py -t && \
-	cd doc/tex && make)
+doc mathics.pdf: mathics/doc/tex/data
+	(cd mathics/doc/tex && $(MAKE) mathics.pdf)
 
 #: Remove ChangeLog
 rmChangeLog:

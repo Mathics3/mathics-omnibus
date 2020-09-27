@@ -67,14 +67,12 @@ else:
 # General Requirements
 INSTALL_REQUIRES += [
     "sympy>=1.6, < 1.7",
-    "django >= 1.8, < 1.12",
+    "django >= 3.0, < 3.2",
     "mpmath>=1.1.0",
     "numpy",
     "palettable", # For bar charts, and portable, no-proprietary color palletes
     "pint",
-    "pydot", # For graphs
     "python-dateutil",
-    "colorama",
     "llvmlite",
     "requests",
 ]
@@ -240,6 +238,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Scientific/Engineering",

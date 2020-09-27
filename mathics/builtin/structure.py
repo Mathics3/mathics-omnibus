@@ -82,7 +82,7 @@ class Sort(Builtin):
             evaluation.message("Sort", "normal")
         else:
             new_leaves = sorted(list.leaves)
-            return Expression(list.head, *new_leaves)
+            return list.restructure(list.head, new_leaves, evaluation)
 
     def apply_predicate(self, list, p, evaluation):
         "Sort[list_, p_]"
@@ -103,7 +103,7 @@ class Sort(Builtin):
                     )
 
             new_leaves = sorted(list.leaves, key=Key)
-            return Expression(list.head, *new_leaves)
+            return list.restructure(list.head, new_leaves, evaluation)
 
 
 class SortBy(Builtin):
@@ -173,50 +173,50 @@ class SortBy(Builtin):
             # we sort a list of indices. after sorting, we reorder the leaves.
             new_indices = sorted(list(range(len(raw_keys))), key=Key)
             new_leaves = [raw_keys[i] for i in new_indices]  # reorder leaves
-            return Expression(l.head, *new_leaves)
+            return l.restructure(l.head, new_leaves, evaluation)
 
 
 class BinarySearch(Builtin):
     """
     <dl>
-    <dt>'Combinatorica`BinarySearch[$l$, $k$]'
+    <dt>'CombinatoricaOld`BinarySearch[$l$, $k$]'
         <dd>searches the list $l$, which has to be sorted, for key $k$ and returns its index in $l$. If $k$ does not
         exist in $l$, 'BinarySearch' returns (a + b) / 2, where a and b are the indices between which $k$ would have
         to be inserted in order to maintain the sorting order in $l$. Please note that $k$ and the elements in $l$
         need to be comparable under a strict total order (see https://en.wikipedia.org/wiki/Total_order).
 
-    <dt>'Combinatorica`BinarySearch[$l$, $k$, $f$]'
+    <dt>'CombinatoricaOld`BinarySearch[$l$, $k$, $f$]'
         <dd>the index of $k in the elements of $l$ if $f$ is applied to the latter prior to comparison. Note that $f$
         needs to yield a sorted sequence if applied to the elements of $l.
     </dl>
 
-    >> Combinatorica`BinarySearch[{3, 4, 10, 100, 123}, 100]
+    >> CombinatoricaOld`BinarySearch[{3, 4, 10, 100, 123}, 100]
      = 4
 
-    >> Combinatorica`BinarySearch[{2, 3, 9}, 7] // N
+    >> CombinatoricaOld`BinarySearch[{2, 3, 9}, 7] // N
      = 2.5
 
-    >> Combinatorica`BinarySearch[{2, 7, 9, 10}, 3] // N
+    >> CombinatoricaOld`BinarySearch[{2, 7, 9, 10}, 3] // N
      = 1.5
 
-    >> Combinatorica`BinarySearch[{-10, 5, 8, 10}, -100] // N
+    >> CombinatoricaOld`BinarySearch[{-10, 5, 8, 10}, -100] // N
      = 0.5
 
-    >> Combinatorica`BinarySearch[{-10, 5, 8, 10}, 20] // N
+    >> CombinatoricaOld`BinarySearch[{-10, 5, 8, 10}, 20] // N
      = 4.5
 
-    >> Combinatorica`BinarySearch[{{a, 1}, {b, 7}}, 7, #[[2]]&]
+    >> CombinatoricaOld`BinarySearch[{{a, 1}, {b, 7}}, 7, #[[2]]&]
      = 2
     """
 
-    context = "Combinatorica`"
+    context = "CombinatoricaOld`"
 
     rules = {
-        "Combinatorica`BinarySearch[l_List, k_] /; Length[l] > 0": "Combinatorica`BinarySearch[l, k, Identity]"
+        "CombinatoricaOld`BinarySearch[l_List, k_] /; Length[l] > 0": "CombinatoricaOld`BinarySearch[l, k, Identity]"
     }
 
     def apply(self, l, k, f, evaluation):
-        "Combinatorica`BinarySearch[l_List, k_, f_] /; Length[l] > 0"
+        "CombinatoricaOld`BinarySearch[l_List, k_, f_] /; Length[l] > 0"
 
         leaves = l.leaves
 
@@ -1006,10 +1006,9 @@ class Flatten(Builtin):
         expr, depth = walk_levels(expr, callback=callback, include_pos=True)
 
         # build new tree inserting nodes as needed
-        result = Expression(h)
         leaves = sorted(new_indices.items())
 
-        def insert_leaf(expr, leaves):
+        def insert_leaf(leaves):
             # gather leaves into groups with the same leading index
             # e.g. [((0, 0), a), ((0, 1), b), ((1, 0), c), ((1, 1), d)]
             # -> [[(0, a), (1, b)], [(0, c), (1, d)]]
@@ -1023,16 +1022,16 @@ class Flatten(Builtin):
                     grouped_leaves.append([(index[1:], leaf)])
             # for each group of leaves we either insert them into the current level
             # or make a new level and recurse
+            new_leaves = []
             for group in grouped_leaves:
                 if len(group[0][0]) == 0:  # bottom level leaf
                     assert len(group) == 1
-                    expr.leaves.append(group[0][1])
+                    new_leaves.append(group[0][1])
                 else:
-                    expr.leaves.append(Expression(h))
-                    insert_leaf(expr.leaves[-1], group)
+                    new_leaves.append(Expression(h, *insert_leaf(group)))
 
-        insert_leaf(result, leaves)
-        return result
+            return new_leaves
+        return Expression(h, *insert_leaf(leaves))
 
     def apply(self, expr, n, h, evaluation):
         "Flatten[expr_, n_, h_]"
@@ -1062,8 +1061,7 @@ class Null(Predefined):
     >> a:=b
     in contrast to the empty string:
     >> ""
-     = 
-    (watch the empty line).
+     = #<--#
     """
 
 
@@ -1279,7 +1277,7 @@ class Operate(Builtin):
         # Otherwise, if we get here, e.head points to the head we need
         # to apply p to. Python's reference semantics mean that this
         # assignment modifies expr as well.
-        e.head = Expression(p, e.head)
+        e.set_head(Expression(p, e.head))
 
         return expr
 
