@@ -17,6 +17,28 @@ from mathics import settings
 from mathics.core.definitions import PyMathicsLoadException
 
 
+def repl_pattern_by_symbol(expr):
+    leaves = expr.get_leaves()
+    if len(leaves) == 0:
+        return expr
+
+    headname = expr.get_head_name()
+    if headname == "System`Pattern":
+        return leaves[0]
+
+    changed = False
+    newleaves = []
+    for leave in leaves:
+        l = repl_pattern_by_symbol(leave)
+        if not(l is leave):
+            changed = True
+        newleaves.append(l)
+    if changed:
+        return Expression(headname,*newleaves)
+    else:
+        return expr
+
+
 def get_symbol_list(list, error_callback):
     if list.has_form('List', None):
         list = list.leaves
@@ -37,6 +59,13 @@ class _SetOperator(object):
     def assign_elementary(self, lhs, rhs, evaluation, tags=None, upset=False):
         name = lhs.get_head_name()
         lhs._format_cache = None
+
+        if name == "System`Pattern":
+            lhsleaves= lhs.get_leaves()
+            lhs = lhsleaves[1]
+            rulerepl = (lhsleaves[0], repl_pattern_by_symbol(lhs))
+            rhs, status = rhs.apply_rules([Rule(*rulerepl)], evaluation)
+            name = lhs.get_head_name()
 
         if name in system_symbols('OwnValues', 'DownValues', 'SubValues',
                                   'UpValues', 'NValues', 'Options',
@@ -220,7 +249,7 @@ class _SetOperator(object):
         elif lhs_name == 'System`$ContextPath':
             currContext = evaluation.definitions.get_current_context()
             context_path = [s.get_string_value()  for s in rhs.get_leaves()]
-            context_path = [s if (s is None or s[0]!="`") else currContext +s for s in context_path]
+            context_path = [s if (s is None or s[0]!="`") else currContext[:-1] +s for s in context_path]
             if rhs.has_form('List', None) and all(valid_context_name(s) for s in context_path):
                 evaluation.definitions.set_context_path(context_path)
                 ignore_protection = True
@@ -845,7 +874,7 @@ class Information(PrefixOperator):
      = f[x] returns the square of x
 
     >> ? Table
-     = 
+     =
      .   'Table[expr, {i, n}]'
      .     evaluates expr with i ranging from 1 to n, returning
      . a list of the results.
@@ -858,7 +887,7 @@ class Information(PrefixOperator):
      .
 
     >> Information[Table]
-     = 
+     =
      .   'Table[expr, {i, n}]'
      .     evaluates expr with i ranging from 1 to n, returning
      . a list of the results.
@@ -1037,8 +1066,16 @@ class Clear(Builtin):
 
     def apply(self, symbols, evaluation):
         '%(name)s[symbols___]'
-
-        for symbol in symbols.get_sequence():
+        if isinstance(symbols ,Symbol):
+            symbols = [symbols]
+        elif isinstance(symbols, Expression):
+            symbols = symbols.get_leaves()
+        elif isinstance(symbols ,String):
+            symbols = [symbols]
+        else:
+            symbols = symbols.get_sequence()
+ 
+        for symbol in symbols:
             if isinstance(symbol, Symbol):
                 names = [symbol.get_name()]
             else:
@@ -1046,6 +1083,10 @@ class Clear(Builtin):
                 if not pattern:
                     evaluation.message('Clear', 'ssym', symbol)
                     continue
+                if pattern[0] == "`":
+                    pattern = (evaluation.definitions.get_current_context()
+                               + pattern[1:])
+
                 names = evaluation.definitions.get_matching_names(pattern)
             for name in names:
                 attributes = evaluation.definitions.get_attributes(name)
@@ -1692,23 +1733,6 @@ class LoadModule(Builtin):
     >> LoadModule["sys"]
      : Python module sys is not a pymathics module.
      = $Failed
-    # >>  LoadModule["pymathics.testpymathicsmodule"]
-    # =  pymathics.testpymathicsmodule
-    # >>  MyPyTestContext`MyPyTestFunction[a]
-    # = This is a PyMathics output
-    # >> MyPyTestContext`MyPyTestSymbol
-    # = 1234
-    # >> ?? MyPyTestContext`MyPyTestFunction
-    # =
-    # . 'MyPyTestFunction'[m]
-    # . Just an example function in pymathics module.
-    # .
-    # . Attributes[MyPyTestContext`MyPyTestFunction] = {HoldFirst, OneIdentity, Protected}
-    # >> Quit[]
-    #n>> MyPyTestContext`MyPyTestSymbol
-    #  = MyPyTestContext`MyPyTestSymbol
-    # >> ?? MyPyTestContext`MyPyTestFunction
-    # =  Null
     """
     name = "LoadModule"
     messages = {'notfound': 'Python module `1` does not exist.',
@@ -1727,4 +1751,17 @@ class LoadModule(Builtin):
         except PyMathicsLoadException as e:
             evaluation.message(self.get_name(), 'notmathicslib', module)
             return Symbol('$Failed')
+        else:
+            # Add PyMathics` to $ContextPath so that when user don't
+            # have to qualify PyMathics variables and functions,
+            # as the those in teh module just loaded.
+
+            # Following the example of $ContextPath in the WL
+            # reference manual where PackletManager appears first in
+            # the list, it seems to be preferable to add this PyMathics
+            # at the beginning.
+            context_path = evaluation.definitions.get_context_path()
+            if "PyMathics`" not in context_path:
+                context_path.insert(0, "PyMathics`")
+            evaluation.definitions.set_context_path(context_path)
         return module

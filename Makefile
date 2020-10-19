@@ -4,12 +4,29 @@
 # These comments before the targets start with #:
 # remake --tasks to shows the targets and the comments
 
+DOCKER_COMPOSE ?= docker-compose
+DOCKER_COMPOSE_FILE =
 GIT2CL ?= admin-tools/git2cl
 PYTHON ?= python3
 PIP ?= pip3
 RM  ?= rm
 
-.PHONY: all build check clean develop dist doc doc-data gstest pytest test djangotest rmChangeLog
+.PHONY: all build \
+   check clean \
+   develop dist doc doc-data djangotest docker \
+   gstest pytest \
+   rmChangeLog \
+   test
+
+SANDBOX	?=
+ifeq ($(OS),Windows_NT)
+	SANDBOX = t
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		SANDBOX = t
+	endif
+endif
 
 #: Default target - same as "develop"
 all: develop
@@ -21,6 +38,10 @@ build:
 #: Set up to run from the source tree
 develop:
 	$(PIP) install -e .
+
+#: Build docker image
+docker-image:
+	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) build
 
 #: Install mathics
 install:
@@ -55,7 +76,7 @@ doc-data mathics/doc/tex/data: mathics/builtin/*.py mathics/doc/documentation/*.
 
 #: Run tests that appear in docstring in the code.
 doctest:
-	$(PYTHON) mathics/test.py $o
+	SANDBOX=$(SANDBOX) $(PYTHON) mathics/test.py $o
 
 #: Run Django tests
 djangotest:

@@ -1,8 +1,77 @@
 CHANGES
 =======
 
-1.1
----
+1.1.1
+-----
+
+This is the last update before some major refactoring and interface changing occurs.
+
+After this relase, Django will no longer be bundled here. See `mathics-django <https://github.com/Mathics3/mathics-django>` for the unbundled replacement.
+
+Some changes were made to support `Pymathics Graph <https://github.com/Mathics3/pymathics-graph>`_, a new graph package bundled separately,
+and to support the ability for front-ends to handle rendering on their own.
+
+
+Package Updates
+++++++++++++++++
+
+- sympy 1.7.1
+
+Mathics Packages added:
+
+- ``DiscreteMath`CombinatoricaV0.9`` and
+  ``DiscreteMath`CombinatoricaV0.6``. V0.9 covers Steven Skiena's older "Implementing Discrete Mathematics: Combinatorics and Graph Theory" book.
+
+If you have a package that you would like included in the distribution, and it works with Mathics, please contact us.
+
+
+
+New builtins:
+++++++++++++++++++++++++++++
+
+- ``StirlingS1``, ``StirlingS2`` (not all WL variations handled)
+- ``MapAt`` (not all WL variations handled)
+- ``PythonForm``, ``SympyForm`` these is not in WL. It simply will show a crude translation to ``sympy`` or ``python``. Expect more and better translation later
+- ``Throw`` and ``Catch``
+- ``With``
+- Start ``FileNameTake``
+
+  Enhancements and Bug fixes:
++++++++++++++++++++++++++++
+
+- Workaround for ``Compile`` so it accepts functions ##1026
+- Add ``Trace`` option to ``Get``. ``Get["fn", Trace->True]`` will show lines as they are read.
+- Add bool for ``from_python``
+- Extend ``DeleteCases`` to accept a levelspec parameter.
+- Set Evaluation#exc_result to capture ``Aborted``, ``Timeout``, ``Overflow1``, etc.
+- ``ImageData`` changed to get bits {0,1} not bools.
+- add tokenizer symbols for <-> and -> and the unicode versions of those.
+- fix ``Needs``
+- ``System`$InputFileName`` is now set inside ``Needs`` and ``Get``
+
+1.1.0
+-----
+
+So we can get onto PyPI, the PyPI install name has changed from Mathics to Mathics3.
+
+
+Enhancements and Bug fixes:
++++++++++++++++++++++++++++
+
+- Add Symbolic Comparisons. PR #1000
+- Support for externally PyPI-packagable builtin modules - PyMathics.
+- ``SetDirectory`` fixes. PR #994
+- Catch ```PatternError`` Exceptions.
+- Fix formatting of ``..`` and ``...`` (``RepeatAll``)
+- tokenization of ``\.`` without a following space (``ReplaceAll``). Issue #992
+- Support for assignments to named ```Pattern```
+- Improving support for ```Names``. PR #1003
+- Adding a ``MathicsSession`` class to simplify running Mathics from Python. PR #1001
+- Improving support for ```Protect``` and ```Unprotect``` list of symbols and regular expressions. PR #1003
+
+
+1.1.0 rc1
+---------
 
 Package Updates
 +++++++++++++++
@@ -10,11 +79,11 @@ Package Updates
 All major packages that Mathics needs have been updated for more recent
 releases. Specifically These include:
 
-- Python: Python 3.6-3.8 is now supported.
-- sympy 1.6.2
+- Python: Python 3.6-3.9 are now supported.
 - cython >= 0.15.1
 - Django 3.1.x
-
+- mpmath => 1.1.0
+- sympy 1.6.2
 
 New features (50+ builtins):
 ++++++++++++++++++++++++++++
@@ -53,11 +122,11 @@ New features (50+ builtins):
 - support for ``MATHICS_MAX_RECURSION_DEPTH``
 - option ``--full-form`` (``-F``) on ``mathics`` to parsed ``FullForm`` of input expressions
 
-Ehancements and Bug fixes:
+Enhancements and Bug fixes:
 +++++++++++++++++++++++++++
 
 - speed up leading-blank patterns #625, #933
-- support for iteration over Sequence objects in Table, Sum, and Product 
+- support for iteration over Sequence objects in Table, Sum, and Product
 - fixes for option handling
 - fixes for ``Manipulate[x,{x,{a,b}}]``
 - fixes rule -> rule case for ``Nearest``
@@ -106,17 +175,17 @@ Backward incompatablities:
 
 - Support for Python 3.5 and earlier, and in particular Python 2.7,
   has dropped
-- The `graphs` module (for Graphs) has been pulled until Mathics
+- The ``graphs`` module (for Graphs) has been pulled until Mathics
   supports pymathics and graphics using networkx better. It will
   reappear as a pymathics module.
-- The `natlang` (for Natural Language processing) has also been
+- The ``natlang`` (for Natural Language processing) has also been
   pulled.  The problem here too is that the pymathics mechanism needs
   a small amount of work to make it scalable, and in 1.0 these were
-  hard coded. Also, both this module and `graphs` pulled in some
+  hard coded. Also, both this module and ``graphs`` pulled in some
   potentially hard-to-satisfy non-Python dependencies such as
   matplotlib, or NLP libraries, and word lists. All of this made
   installation of mathics harder, and the import of these libraries,
-  `natlang` in particular took some time. All of this points to having
+  ``natlang`` in particular took some time. All of this points to having
   these live in their own repositories and get imported on laziliy on
   demand
 
@@ -125,7 +194,8 @@ Backward incompatablities:
 1.0
 ---
 
-New features:
+New features
+++++++++++++
 
 - ``LinearModelFit`` #592
 - ``EasterSunday`` #590
@@ -212,7 +282,8 @@ New features:
 - ``StringExpression`` #339
 - Legacy file functions #338
 
-Bug fixes:
+Bug fixes
+++++++++++
 
 - Nested ``Module`` #591, #584
 - Python2 Import bug #565
@@ -242,12 +313,13 @@ Bug fixes:
 - Fix ``Begin``/``BeginPackage`` leaking user-visible symbols #352
 - Fix ``TableForm`` and ``Dimensions`` with an empty list #343
 - Trailing slash bug #337
-- Global system bug #336
+- ``Global`` system bug #336
 - ``Null`` comparison bug #371
-- ``CompoundExpression`` ``Out[n]`` assignment bug #335 fixes #331
+- ``CompoundExpression`` and ``Out[n]`` assignment bug #335 fixes #331
 - load unevaluated cells #332
 
-Performance improvements:
+Performance improvements
+++++++++++++++++++++++++
 
 - Large expression formatting with ``$OutputSizeLimit`` #581
 - Faster terminal output #579
@@ -275,7 +347,8 @@ Performance improvements:
 0.9
 ---
 
-New features:
+New features
+++++++++++++
 
 - Improved syntax error messages #329
 - SVD, LeastSquares, PseudoInverse #258, #321
@@ -314,28 +387,32 @@ Bug fixes:
 0.8
 ---
 
-New features:
+New features
++++++++++++++
 
 - Improvements to 3D Plotting, see #238
 - Enable MathJax menu, see #236
 - Improvements to documentation
 
-Dependency Updates:
+Dependency Updates
+++++++++++++++++++
 
 - upgrade to sympy 0.7.6
 - upgrade to ply3.6 (new parsetab format, see #246)
 - upgrade to mpmath 0.19
 
-Bug Fixes:
+Bug Fixes
++++++++++
 
 - IntegerDigits[0]
 
 
 
 0.7
----
++++
 
-New features:
+New features
+++++++++++++
 
 - Readline tab completion
 - automatic database initialisation
@@ -344,7 +421,8 @@ New features:
 - More tests and documentation for ``Sequence``
 - Context support
 
-Bugs fixed:
+Bugs fixed
+++++++++++
 
 - Fix unevaluated index handling (issue #217)
 - Fix ``Solve`` treating one solution equal to 1 as a tautology (issue
@@ -363,7 +441,8 @@ Bugs fixed:
 0.6
 ---
 
-New features:
+New features
+++++++++++++
 
 - ElementData using data from Wikipedia
 - added Switch
@@ -387,7 +466,8 @@ New features:
 - Use interruptingcow to limit evaluation time
 - Character Code functions
 
-Bugs fixed:
+Bugs fixed
+++++++++++
 
 - Fix divide-by-zero with zero-length plot range
 - Fix mathicsserver exception on startup with Django 1.6 (issues #194,

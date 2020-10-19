@@ -20,7 +20,7 @@ from mathics.builtin.comparison import expr_min
 from mathics.builtin.lists import list_boxes
 from mathics.builtin.options import options_to_rules
 from mathics.core.expression import (
-    Expression, String, Symbol, Integer, Real, BoxError,
+    Expression, String, StringFromPython, Symbol, Integer, Real, BoxError,
     from_python, MachineReal, PrecisionReal)
 from mathics.core.numbers import (
     dps, convert_base, machine_precision, reconstruct_digits)
@@ -46,6 +46,7 @@ class UseSansSerif(Predefined):
     """
     context = "System`"
     name = '$UseSansSerif'
+    attributes = ("Unprotected",)
     value = True
 
     rules = {
@@ -462,7 +463,7 @@ class MakeBoxes(Builtin):
      = RowBox[{a, ,, b}]
     """
 
-    attributes = ('HoldAllComplete',)
+    attributes = ('HoldAllComplete', "Unprotected")
 
     rules = {
         'MakeBoxes[Infix[head_[leaves___]], '
@@ -1745,11 +1746,13 @@ class General(Builtin):
                   "{n}, or {m, n}."),
         'locked': "Symbol `1` is locked.",
         'matsq': "Argument `1` is not a non-empty square matrix.",
+        'newpkg': "In WL, there is a new package for this.",
         'noopen': "Cannot open `1`.",
         'nord': "Invalid comparison with `1` attempted.",
         'normal': "Nonatomic expression expected.",
         'noval': (
             "Symbol `1` in part assignment does not have an immediate value."),
+        'obspkg': "In WL, this package is obsolete.",
         'openx': "`1` is not open.",
         'optb': "Optional object `1` in `2` is not a single blank.",
         'ovfl': "Overflow occurred in computation.",
@@ -1933,6 +1936,79 @@ class MathMLForm(Builtin):
 
         mathml = '<math display="block">%s</math>' % xml  # convert_box(boxes)
         return Expression('RowBox', Expression('List', String(mathml)))
+
+
+class PythonForm(Builtin):
+    """
+    <dl>
+      <dt>'PythonForm[$expr$]'
+      <dd>returns an approximate equivalent of $expr$ in Python, when that is possible. We assume
+      that Python has sympy imported. No explicit import will be include in the result.
+    </dl>
+
+    >> PythonForm[Infinity]
+<<<<<<< HEAD
+<<<<<<< HEAD
+    = math.inf
+=======
+    = inf
+>>>>>>> 3c34d588... Add PythonForm and use sympy numeric constants
+=======
+    = math.inf
+>>>>>>> 18ea8185... Correct math.inf. Add test
+    >> PythonForm[Pi]
+    = sympy.pi
+    >> E // PythonForm
+    = sympy.E
+    >> {1, 2, 3} // PythonForm
+    = [1, 2, 3]
+    """
+    # >> PythonForm[HoldForm[Sqrt[a^3]]]
+    #  = sympy.sqrt{a**3} # or something like this
+
+
+    def apply_python(self, expr, evaluation) -> Expression:
+        'MakeBoxes[expr_, PythonForm]'
+
+        try:
+            # from trepan.api import debug; debug()
+            python_equivalent = expr.to_python(python_form = True)
+        except:
+            return
+        return StringFromPython(python_equivalent)
+
+    def apply(self, expr, evaluation) -> Expression:
+        "PythonForm[expr_]"
+        return self.apply_python(expr, evaluation)
+
+
+class SympyForm(Builtin):
+    """
+    <dl>
+      <dt>'SympyForm[$expr$]'
+      <dd>returns an Sympy $expr$ in Python. Sympy is used internally
+      to implement a number of Mathics functions, like Simplify.
+    </dl>
+
+    >> SympyForm[Pi^2]
+    = pi**2
+    >> E^2 + 3E // SympyForm
+    = exp(2) + 3*E
+    """
+
+    def apply_sympy(self, expr, evaluation) -> Expression:
+        'MakeBoxes[expr_, SympyForm]'
+
+        try:
+            # from trepan.api import debug; debug()
+            sympy_equivalent = expr.to_sympy()
+        except:
+            return
+        return StringFromPython(sympy_equivalent)
+
+    def apply(self, expr, evaluation) -> Expression:
+        "SympyForm[expr_]"
+        return self.apply_sympy(expr, evaluation)
 
 
 class TeXForm(Builtin):
