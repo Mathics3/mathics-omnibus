@@ -84,10 +84,13 @@ class With(Builtin):
     >> With[{x=y}, Hold[x]]
      = Hold[y]
 
+<<<<<<< HEAD
 =======
     >> With[{x=y}, Hold[x]]
      = Hold[y]
 >>>>>>> 7a310f93... adding support for With
+=======
+>>>>>>> 47ea5449... removing CombinatoricaOld`
     >> Table[With[{i=j}, Hold[i]],{j,1,4}]
      = {Hold[1], Hold[2], Hold[3], Hold[4]}
     >> x=5; With[{x=x}, Hold[x]]
@@ -481,7 +484,10 @@ class Contexts(Builtin):
      = {"Global`", "ImportExport`", "Internal`", "System`", "System`Convert`B64Dump`", "System`Convert`Image`", "System`Convert`JSONDump`", "System`Convert`TableDump`", "System`Convert`TextDump`", "System`Private`", "XML`", "XML`Parser`"}
 =======
     X> Contexts[] // InputForm
+<<<<<<< HEAD
 >>>>>>> ca9b652a... Go over doc examples to remove fragility
+=======
+>>>>>>> 47ea5449... removing CombinatoricaOld`
     """
 
     def apply(self, evaluation):

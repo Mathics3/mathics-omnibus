@@ -3690,7 +3690,7 @@ class Streams(Builtin):
 
 
 class Compress(Builtin):
-    """
+    u"""
     <dl>
     <dt>'Compress[$expr$]'
       <dd>gives a compressed string representation of $expr$.
@@ -4798,7 +4798,6 @@ class DirectoryQ(Builtin):
             return Symbol("True")
         return Symbol("False")
 
-
 class Needs(Builtin):
     """
     <dl>
@@ -4910,10 +4909,18 @@ class Needs(Builtin):
     }
 
     def apply(self, context, evaluation):
-        "Needs[context_String]"
+        'Needs[context_String]'
+        contextstr = context.get_string_value()
+        if contextstr == "":
+            return SymbolNull
+        if contextstr[0]=="`":
+            curr_ctxt = evaluation.definitions.get_current_context()
+            contextstr = curr_ctxt + contextstr[1:]
+            context = String(contextstr)
 
-        if not valid_context_name(context.get_string_value()):
-            evaluation.message("Needs", "ctx", Expression("Needs", context), 1, "`")
+        if not valid_context_name(contextstr):
+            evaluation.message('Needs', 'ctx', Expression(
+                'Needs', context), 1, '`')
             return
         test_loaded = Expression("MemberQ", Symbol("$Packages"), context)
         test_loaded = test_loaded.evaluate(evaluation)
@@ -4921,7 +4928,15 @@ class Needs(Builtin):
             # Already loaded
             return SymbolNull
 
-        result = Expression("Get", context).evaluate(evaluation)
+        # TODO: Figure out why this raises the message:
+        # "Select::normal: Nonatomic expression expected."
+        already_loaded = Expression('MemberQ',
+                                    Symbol('System`$Packages'), context)
+        already_loaded = already_loaded.evaluate(evaluation).is_true()
+        if already_loaded:
+           return SymbolNull
+
+        result = Expression('Get', context).evaluate(evaluation)
 
         if result == Symbol("$Failed"):
             evaluation.message("Needs", "nocont", context)

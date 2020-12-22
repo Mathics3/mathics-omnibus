@@ -47,11 +47,7 @@ docker-image:
 install:
 	$(PYTHON) setup.py install
 
-#: Run Django-based server in development mode. Use environment variable "o" for manage options
-runserver:
-	$(PYTHON) mathics/manage.py runserver $o
-
-check: pytest doctest djangotest gstest
+check: pytest doctest gstest
 
 #: Remove derived files
 clean:
@@ -67,7 +63,7 @@ pytest:
 
 #: Run a more extensive pattern-matching test
 gstest:
-	(cd examples/symbolic_logic/gries_schneider && ./test-gs.sh)
+	(cd examples/symbolic_logic/gries_schneider && $(PYTHON) test_gs.py)
 
 
 #: Create data that is used to in Django docs and to build TeX PDF
@@ -77,10 +73,6 @@ doc-data mathics/doc/tex/data: mathics/builtin/*.py mathics/doc/documentation/*.
 #: Run tests that appear in docstring in the code.
 doctest:
 	SANDBOX=$(SANDBOX) $(PYTHON) mathics/test.py $o
-
-#: Run Django tests
-djangotest:
-	cd mathics && $(PYTHON) manage.py test test_django
 
 #: Make Mathics PDF manual
 doc mathics.pdf: mathics/doc/tex/data
