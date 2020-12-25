@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
-RUN pip install mathicsscript
+RUN pip install -e git://github.com/mathics3/mathicsscript.git#egg=mathicsscript
 RUN python -m nltk.downloader wordnet omw
 RUN python -m spacy download en
 RUN pip install -e git://github.com/mathics/Mathics@remove-frontends#egg=Mathics3

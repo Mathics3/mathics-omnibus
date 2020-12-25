@@ -4,6 +4,7 @@
 # These comments before the targets start with #:
 # remake --tasks to shows the targets and the comments
 
+DOCKER ?= docker
 DOCKER_COMPOSE ?= docker-compose
 DOCKER_COMPOSE_FILE =
 GIT2CL ?= admin-tools/git2cl
@@ -12,6 +13,8 @@ RM  ?= rm
 .PHONY: all docker-image \
    check clean \
    rmChangeLog \
+   push \
+   upload \
    test
 
 SANDBOX	?=
@@ -26,6 +29,10 @@ endif
 
 #: Default target - same as "develop"
 all: docker-image
+
+#: Push back to dockerhup
+push uploade:
+	$(DOCKER) push mathicsorg/mathics:latest
 
 #: Build docker image
 docker-image:
