@@ -1,0 +1,47 @@
+Mathics was originally created by:
+
+- Jan Pöschko @poeschko
+
+Mathics is currently maintained by:
+
+- Angus Griffith @sn6uv
+- Ben Jones @bnjones
+
+Additional contributions were made by:
+
+- Mingye Wang @Arthur2e5
+- Ali Abbas @alouche
+- Andrew Zhao @azhao12345
+- @Bth8
+- Chong Jiang @cjiang
+- Antonio Marquez-Raygoza @freshwater
+- @GitAnt
+- Josh Chen @jaycech3n
+- Yingjie Lan @lanyjie
+- @limeblack
+- Martin Portman @mportman
+- Mauricio Matera @mmatera
+- Marek Šuppa @mrshu
+- Marco Savelli @Piruzzolo
+- Toshiyuki Ogura @ogra
+- Bernhard Liebl @poke1024
+- @proxy-sander
+- Andrew Murray @radarhere
+- Jim Radford @radford
+- Timothy Cyrus @tcyrus
+- Wolf Vollprecht @wolfv
+- Сухарик @suhr
+- Pablo Emilio Escobar Gaviria @GarkGarcia
+
+Thanks to the authors of all projects that are used in Mathics:
+- Django
+- MathJax
+- Prototype
+- Python
+- scripaculous
+- colorama
+- SymPy
+- Three.js
+- dateutil
+- colorama
+- six
