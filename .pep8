@@ -1,3 +1,0 @@
-[pep8]
-ignore = E501,W291
-exclude = magic.py,build/,.tox/
