@@ -31,7 +31,7 @@ endif
 all: docker-image
 
 #: Push back to dockerhup
-push uploade:
+push upload:
 	$(DOCKER) push mathicsorg/mathics:latest
 
 #: Build docker image
