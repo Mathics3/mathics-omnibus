@@ -10,6 +10,7 @@ RUN chmod +x /entrypoint.sh
 
 COPY requirements.txt ./
 RUN apt-get update
+RUN apt-get insetall apt-utils
 RUN apt-get install -qq liblapack-dev llvm-dev gfortran maria
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./

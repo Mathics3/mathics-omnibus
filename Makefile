@@ -31,11 +31,15 @@ endif
 all: docker-image
 
 #: Push back to dockerhup
-push upload:
+install push upload:
 	$(DOCKER) push mathicsorg/mathics:latest
 
-#: Build docker image
+#: Build docker image with cache clearing
 docker-image:
+	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) build --no-cache
+
+#: Build docker image without clearing cache
+docker-image-quick:
 	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_FILE) build
 
 # check: pytest gstest
