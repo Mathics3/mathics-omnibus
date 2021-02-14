@@ -23,8 +23,6 @@ RUN pip install pymathics-graph
 RUN pip install -e git://github.com/mathics3/mathicsscript.git#egg=mathicsscript
 RUN python -m nltk.downloader wordnet omw
 RUN python -m spacy download en
-RUN pip install -e git://github.com/mathics/Mathics#egg=Mathics3
-RUN pip install -e git://github.com/mathics3/mathics-django.git#egg=mathics_django
 
 EXPOSE 8000
 
