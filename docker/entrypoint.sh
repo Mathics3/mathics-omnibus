@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/src/app/.local/bin
+
 script_cmd="${ENTRYPOINT_COMMAND:-$(basename $0)}"
 
 function help() {
