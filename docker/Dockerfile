@@ -18,13 +18,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
+RUN pip install Mathics-Django
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
-RUN pip install -e git://github.com/mathics3/mathicsscript.git#egg=mathicsscript
+RUN pip install mathicsscript
 RUN python -m nltk.downloader wordnet omw
 RUN python -m spacy download en
-RUN pip install -e git://github.com/mathics/Mathics#egg=Mathics3
-RUN pip install -e git://github.com/mathics3/mathics-django.git#egg=mathics_django
 
 EXPOSE 8000
 
