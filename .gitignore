@@ -8,7 +8,10 @@
 .vscode
 /.cache
 /.python-version
+/Mathics_omnibus.egg-info
 /__pycache__
+/build
+/dist
 /mathics_omnibus.egg-info
 ChangeLog
 Documents/

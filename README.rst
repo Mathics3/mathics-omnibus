@@ -15,7 +15,6 @@ This repository also contains the dockerfiile to create the `mathicsorg/mathics 
 
 That image is a combination of:
 
-* `Mathics <https://github.com/mathics/Mathics>`_
 * `mathicsscript <https://github.com/Mathics3/mathicsscript>`_
 * `Mathics-Django <https://github.com/Mathics3/Mathics-Django>`_
 * `pymathics-natlang <https://github.com/Mathics3/pymathics-natlang>`_

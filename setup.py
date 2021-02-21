@@ -17,7 +17,7 @@ from __pkginfo__ import (
 )
 
 setup(
-    name="mathics-omnibus",
+    name="Mathics-omnibus",
     version=__version__,
     author=author,
     author_email=author_email,
