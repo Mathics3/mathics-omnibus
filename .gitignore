@@ -9,7 +9,7 @@
 /.cache
 /.python-version
 /__pycache__
-/mathics_docker.egg-info
+/mathics_omnibus.egg-info
 ChangeLog
 Documents/
 Homepage/

@@ -6,7 +6,8 @@ This is free software, and you are welcome to redistribute it
 under certain conditions.
 See the documentation for the full license."""
 
+from mathics_scanner import *
 from mathics import *
 from mathicsscript import *
 from mathics_django import *
-from mathics_docker.version import __version__
+from mathics_omnibus.version import __version__

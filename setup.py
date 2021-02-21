@@ -11,14 +11,13 @@ from __pkginfo__ import (
     classifiers,
     install_requires,
     long_description,
-    py_modules,
     scripts,
     short_desc,
     url,
 )
 
 setup(
-    name="mathics-docker",
+    name="mathics-omnibus",
     version=__version__,
     author=author,
     author_email=author_email,

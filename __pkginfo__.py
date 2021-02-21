@@ -21,21 +21,22 @@ def read(*rnames):
 
 
 # Get/set __version__VERSION and long_description from files
-exec(read("mathics_docker/version.py"))
+exec(read("mathics_omnibus/version.py"))
 
 PYTHON_VERSION = sys.version_info[0] + (sys.version_info[1] / 10.0)
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
     "Mathics3 >= 2.0.0",
-    "mathicsscript",
+    "mathicsscript >= 2.0.1",
+    "Mathics-Django >= 2.0.1",
     "pymathics-natlang",
     "pymathics-graph",
 ]
 
 py_modules = None
-short_desc = "Mathics using Docker containers"
-url = "http://github.com/Mathics3/mathics-docker"
+short_desc = "A Collection Mathics components to provide the ful Mathics experience"
+url = "http://github.com/Mathics3/mathics-omnibus"
 
 classifiers = [
     "Operating System :: OS Independent",
@@ -46,4 +47,3 @@ classifiers = [
 ]
 
 long_description = read("README.rst") + "\n"
-exec(read("mathics_docker/version.py"))
