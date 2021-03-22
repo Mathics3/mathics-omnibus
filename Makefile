@@ -30,7 +30,7 @@ endif
 #: Default target - same as "develop"
 all: docker-image
 
-#: Push back to dockerhub
+#: Push local docker image to dockerhub with tag: latest
 install push upload:
 	$(DOCKER) push mathicsorg/mathics:latest
 
