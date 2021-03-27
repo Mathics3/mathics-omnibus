@@ -1,3 +1,5 @@
+|Pypi Installs| |Latest Version| |Supported Python Versions|
+
 `Mathics <https://mathics.org>`_ consists of a number of separable components so that those pieces that are desired can be used without the burden of dependencies of the other parts.
 
 For example if you are interested in just running a command-line interface, you might not be interested in having Django and what that entails and vice versa.
@@ -21,3 +23,10 @@ That image is a combination of:
 * `pymathics-graph <https://github.com/Mathics3/pymathics-graph>`_
 
 It is likely that in the future more components will be added, so stay tuned...
+
+.. |Packaging status| image:: https://repology.org/badge/vertical-allrepos/Mathics-omnibus.svg
+			    :target: https://repology.org/project/Mathics-omnibus/versions
+.. |Latest Version| image:: https://badge.fury.io/py/Mathics-omnibus.svg
+		 :target: https://badge.fury.io/py/Mathics-omnibus
+.. |Pypi Installs| image:: https://pepy.tech/badge/Mathics-omnibus
+.. |Supported Python Versions| image:: https://img.shields.io/pypi/pyversions/Mathics-omnibus.svg
