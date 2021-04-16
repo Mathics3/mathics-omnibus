@@ -22,5 +22,6 @@ pyenchant
 lxml
 matplotlib
 networkx
-git+https://github.com/mathics/Mathics.git#egg=Mathics3
+Mathics3
+# git+https://github.com/mathics/Mathics.git#egg=Mathics3
 # git+https://github.com/mathics/Mathics
