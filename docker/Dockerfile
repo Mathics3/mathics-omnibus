@@ -33,6 +33,7 @@ RUN groupadd mathics && \
     chown -R mathics:mathics $MATHICS_HOME
 
 USER mathics
+COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 
 ENTRYPOINT ["/entrypoint.sh"]
 
