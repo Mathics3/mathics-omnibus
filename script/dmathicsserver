@@ -1,10 +1,16 @@
 #!/bin/bash
 set -x
+
+# Allow customization using POSIX environment variables:
 DOCKER=${DOCKER:-docker}
+MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
+MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-DOCKER=/usr/src/app/data mathicsorg/mathics/${MATHICS_DJANGO_DB_PATH}}
+
 $DOCKER run -it \
   --name mathics-web \
   --rm \
   --env="DISPLAY" \
+  --env="MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
   --workdir=/app \
   --volume="$PWD":/app \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \

@@ -13,7 +13,7 @@ RUN apt-get update
 RUN apt-get install -qq apt-utils
 # we need libsqlite3-dev now if ubuntu doesn't come with that, we'll need
 # to build our own Python
-RUN apt-get install -qq liblapack-dev llvm-dev gfortran maria
+RUN apt-get install -qq liblapack-dev llvm-dev gfortran maria sqlite3
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
