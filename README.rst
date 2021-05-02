@@ -30,3 +30,39 @@ It is likely that in the future more components will be added, so stay tuned...
 		 :target: https://badge.fury.io/py/Mathics-omnibus
 .. |Pypi Installs| image:: https://pepy.tech/badge/Mathics-omnibus
 .. |Supported Python Versions| image:: https://img.shields.io/pypi/pyversions/Mathics-omnibus.svg
+
+
+Docker-specific items
+---------------------
+
+By default, we use a SQLite database that has examples that you can load and use. This data comes from [`mathics-omnibus/django-db/mathics.sqlite`](https://github.com/Mathics3/mathics-omnibus/tree/master/docker/django-db).
+
+Since this is tied to the docker image, any changes made won't survice across restarting the docker image.
+
+If you would like to save your own you can set the environment variable `MATHICS_DJANGO_DB_PATH`. Here is an example:
+
+
+```
+$ MATHICS_DJANGO_DB_PATH=/usr/src/app/data/mathics-django/mathics.sqlite ../mathics-omnibus/script/dmathicsserver
+MATHICS_DJANGO_DB_PATH=/usr/src/app/data/mathics-django/mathics.sqlite ../mathics-omnibus/script/dmathicsserver^J-(../mathics-omnibus/script/dmathicsserver:5):  -[2,0, 0]
+DOCKER=docker
+-(../mathics-omnibus/script/dmathicsserver:6):  -[2,0, 0]
+MATHICS_DJANGO_DB=mathics.sqlite
+-(../mathics-omnibus/script/dmathicsserver:7):  -[2,0, 0]
+MATHICS_DJANGO_DB_PATH=/usr/src/app/data/mathics-django/mathics.sqlite
+-(../mathics-omnibus/script/dmathicsserver:9):  -[2,0, 0]
+docker run -it --name mathics-web --rm --env=DISPLAY --env MATHICS_DJANGO_DB_PATH=/usr/src/app/data/mathics-django/mathics.sqlite --workdir=/app --volume=/src/external-vcs/github/Mathics3/mathics-django:/app --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw -p 8000:8000 -v /tmp:/usr/src/app/data mathicsorg/mathics --mode ui
+
+~~~~ app/data has been mounted to /usr/src/app/data ~~~~
+~~~~ SQLite data (worksheets, user info) will be stored in /usr/src/app/data/mathics-django/mathics.sqlite ~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+warning: database file /usr/src/app/data/mathics-django/mathics.sqlite not found
+
+Migrating database /usr/src/app/data/mathics-django/mathics.sqlite
+Operations to perform:
+  Apply all migrations: auth, contenttypes, sessions, sites, web
+Running migrations:
+```
+
+In the above when it says `mathics.sqlite not found` an empty one is created. The real location of it outside of the container is in `/tmp/mathics-django/mathics.sqlite`.
