@@ -41,16 +41,6 @@ while (( $# )) ; do
     esac
 done
 
-echo
-echo "~~~~ app/data has been mounted to $MATHICS_HOME/data ~~~~"
-if [[ -n $MATHICS_DJANGO_DB_PATH ]]; then
-    echo "~~~~ SQLite data (worksheets, user info) will be stored in $MATHICS_DJANGO_DB_PATH ~~~~"
-else
-    echo "~~~~ SQLite data (worksheets, user info) will be stored in $MATHICS_HOME/data/mathics.sqlite"
-fi
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo
-
 case $mathics_mode in
     cli) mathicsscript
 	 $@
@@ -59,6 +49,15 @@ case $mathics_mode in
 	mathics $@
 	;;
     ui|gui)
+	echo
+	echo "~~~~ app/data has been mounted to $MATHICS_HOME/data ~~~~"
+	if [[ -n $MATHICS_DJANGO_DB_PATH ]]; then
+	    echo "~~~~ SQLite data (worksheets, user info) will be stored in $MATHICS_DJANGO_DB_PATH ~~~~"
+	else
+	    echo "~~~~ SQLite data (worksheets, user info) will be stored in $MATHICS_HOME/data/mathics.sqlite"
+	fi
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	echo
 	mathicsserver -e $@ ;;
     shell)  /bin/bash ;;
     *)   echo "unknown mathics_mode=$mathics_mode. See '$script_cmd --help'" ; exit 2 ;;
