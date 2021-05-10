@@ -30,6 +30,10 @@ endif
 #: Default target - same as "develop"
 all: docker-image
 
+#: Build docker image with cache clearing
+docker-pull:
+	$(DOCKER) pull mathicsorg/mathics:latest
+
 #: Push local docker image to dockerhub with tag: latest
 install push upload:
 	$(DOCKER) push mathicsorg/mathics:latest
