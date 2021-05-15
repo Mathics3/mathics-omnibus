@@ -27,15 +27,15 @@ PYTHON_VERSION = sys.version_info[0] + (sys.version_info[1] / 10.0)
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 >= 2.1.0",
-    "mathicsscript >= 2.0.1",
-    "Mathics-Django >= 2.1.0",
+    "Mathics3 >= 2.2.0",
+    "mathicsscript >= 2.1.2",
+    "Mathics-Django >= 2.2.0",
     "pymathics-natlang",
     "pymathics-graph",
 ]
 
 py_modules = None
-short_desc = "A Collection Mathics components to provide the ful Mathics experience"
+short_desc = "A Collection Mathics components to provide the full Mathics experience"
 url = "http://github.com/Mathics3/mathics-omnibus"
 
 classifiers = [
