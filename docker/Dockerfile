@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
-RUN pip install Mathics3
+RUN pip install "Mathics3>=2.2.0"
 RUN pip install Mathics-Django
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
