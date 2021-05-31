@@ -22,8 +22,11 @@ RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3
 RUN python -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
+RUN (cd src/mathics-django && python mathics_django/test.py -o)
+RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v /root/.local/var/mathics/doc_xml_data.pcl /usr/src/app/.local/var/mathics/doc_xml_data.pcl
+
 RUN python -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript
-RUN cd src/mathicsscript; make
+RUN (cd src/mathicsscript && make)
 
 RUN python -m nltk.downloader wordnet omw
 RUN python -m spacy download en
