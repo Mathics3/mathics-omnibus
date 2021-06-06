@@ -1,27 +1,30 @@
-sympy>=1.8
+IPython==5.0.0
+colorama
+cython
 django >= 3.2.0
+ipykernel
+ipywidgets
+langid
+llvmlite
+lxml
+matplotlib
 mpmath>=1.2.1
+networkx==2.5  # 2.5.1 has dependency on decorator which we can't meet
+nltk
 numpy
 palettable
 pint
-pydot
-python-dateutil
-colorama
-llvmlite
-requests
-cython
-scikit-image
-ipywidgets
-ipykernel
-requests
-IPython==5.0.0
-nltk
-langid
+psutil
 pycountry
+pydot
 pyenchant
-lxml
-matplotlib
-networkx
-Mathics3>=2.2.0
-# git+https://github.com/mathics/Mathics.git#egg=Mathics3
-# git+https://github.com/mathics/Mathics
+pygments>=2.4.1 # To upgrade. Required very indirectly by jupyterlab-pygments. Old version is in focal
+python-dateutil
+requests
+requests
+scikit-image
+sympy>=1.8
+wordcloud # Used in builtin/image.py by WordCloud()
+# Mathics3>=2.2.0
+git+https://github.com/mathics/Mathics.git#egg=Mathics3
+git+https://github.com/mathics/Mathics
