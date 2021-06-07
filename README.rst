@@ -17,7 +17,9 @@ This repository also contains the dockerfiile to create the `mathicsorg/mathics 
 
 That image is a combination of:
 
+* `Mathics-Scanner <https://github.com/Mathics3/mathics-scanner>`_
 * `mathicsscript <https://github.com/Mathics3/mathicsscript>`_
+* `mathics-pygments <https://github.com/Mathics3/mathics-pygments>`_
 * `Mathics-Django <https://github.com/Mathics3/Mathics-Django>`_
 * `pymathics-natlang <https://github.com/Mathics3/pymathics-natlang>`_
 * `pymathics-graph <https://github.com/Mathics3/pymathics-graph>`_
@@ -37,7 +39,7 @@ Docker-specific items
 
 By default, we use a SQLite database that has examples that you can
 load and use. This data comes from
-[`mathics-omnibus/django-db/mathics.sqlite`](https://github.com/Mathics3/mathics-omnibus/tree/master/docker/django-db).
+[mathics-omnibus/django-db/mathics.sqlite](https://github.com/Mathics3/mathics-omnibus/tree/master/docker/django-db).
 
 Since this is tied to the docker image, any changes made won't survice
 across restarting the docker image.
