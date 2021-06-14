@@ -20,7 +20,13 @@ COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
 RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3
+
+# Some time later, build mathics.pdf
+# RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq texlive-font-utils latexmk texlive-xetex lmodern inkscape texlive-latex-extra texlive-fonts-recommended asymptote
+# RUN SANDBOX=t python3 /usr/local/lib/python3.8/dist-packages/mathics/docpipeline.py -ot
+# ... run latex
 RUN python3 -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django
+
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
 RUN (cd src/mathics-django && python3 mathics_django/docpipeline.py -o)
