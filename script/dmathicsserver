@@ -6,6 +6,9 @@ DOCKER=${DOCKER:-docker}
 MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
 MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics/${MATHICS_DJANGO_DB}}
 
+TAG=${TAG:-latest}
+MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+
 $DOCKER run -it \
   --name mathics-web \
   --rm \
@@ -14,5 +17,5 @@ $DOCKER run -it \
   --workdir=/app \
   --volume="$PWD":/app \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-  -p 8000:8000 -v /tmp:/usr/src/app/data mathicsorg/mathics \
+  -p 8000:8000 -v /tmp:/usr/src/app/data $MATHICS_IMAGE \
   --mode ui
