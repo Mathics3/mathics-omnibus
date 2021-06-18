@@ -9,6 +9,7 @@ DOCKER_COMPOSE ?= docker-compose
 DOCKER_COMPOSE_FILE =
 GIT2CL ?= admin-tools/git2cl
 RM  ?= rm
+TAG ?= latest
 
 .PHONY: all docker-image \
    check clean \
@@ -30,13 +31,13 @@ endif
 #: Default target - same as "develop"
 all: docker-image
 
-#: Build docker image with cache clearing
+#: Pull mathics docker image from dockerhub with tag $(TAG). The default tag is "latest".
 docker-pull:
-	$(DOCKER) pull mathicsorg/mathics:latest
+	$(DOCKER) pull mathicsorg/mathics:$(TAG)
 
-#: Push local docker image to dockerhub with tag: latest
+#: Push local docker image to dockerhub with tag $(TAG). The default tag is "latest".
 install push upload:
-	$(DOCKER) push mathicsorg/mathics:latest
+	$(DOCKER) push mathicsorg/mathics:$(TAG)
 
 #: Build docker image with cache clearing
 docker-image:
