@@ -1,7 +1,14 @@
 #!/bin/bash
+set -x
 DOCKER=${DOCKER:-docker}
 
 TAG=${TAG:-latest}
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
-$DOCKER run --rm -it --name mathics-cli -v /tmp:/usr/src/app/data $MATHICS_IMAGE --mode cli -- $@
+$DOCKER run -it \
+	--rm \
+	--env="DISPLAY" \
+	--name mathics-cli \
+	--volume="/tmp:/usr/src/app/data" \
+        $MATHICS_IMAGE \
+	--mode cli -- $@

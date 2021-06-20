@@ -17,5 +17,6 @@ $DOCKER run -it \
   --workdir=/app \
   --volume="$PWD":/app \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-  -p 8000:8000 -v /tmp:/usr/src/app/data $MATHICS_IMAGE \
-  --mode ui
+  --volume="/tmp:/usr/src/app/data" \
+  -p 8000:8000 $MATHICS_IMAGE \
+  --mode ui -- $@
