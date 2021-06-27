@@ -42,8 +42,7 @@ while (( $# )) ; do
 done
 
 case $mathics_mode in
-    cli) mathicsscript
-	 $@
+    cli) mathicsscript $@
 	 ;;
     minimal|mathics)
 	mathics $@

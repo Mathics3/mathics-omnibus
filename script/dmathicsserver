@@ -1,5 +1,7 @@
 #!/bin/bash
-set -x
+if [ -n "$DEBUG" ]; then
+    set -x
+fi
 
 # Allow customization using POSIX environment variables:
 DOCKER=${DOCKER:-docker}

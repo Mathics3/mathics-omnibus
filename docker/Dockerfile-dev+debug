@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
-RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3
+RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3[full]
 
 # Some time later, build mathics.pdf
 # RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq texlive-font-utils latexmk texlive-xetex lmodern inkscape texlive-latex-extra texlive-fonts-recommended asymptote
@@ -32,7 +32,7 @@ RUN pip install pymathics-graph
 RUN (cd src/mathics-django && python3 mathics_django/docpipeline.py -o)
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v /root/.local/var/mathics/doc_xml_data.pcl /usr/src/app/.local/var/mathics/doc_xml_data.pcl
 
-RUN python3 -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript
+RUN python3 -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
 RUN (cd src/mathicsscript && make)
 
 RUN python3 -m nltk.downloader wordnet omw

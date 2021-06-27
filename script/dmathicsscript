@@ -1,5 +1,7 @@
 #!/bin/bash
-set -x
+if [ -n "$DEBUG" ]; then
+    set -x
+fi
 DOCKER=${DOCKER:-docker}
 XAUTH=${XAUTH:-$HOME/.Xauthority}
 touch $XAUTH
@@ -15,6 +17,5 @@ $DOCKER run -it \
 	--interactive \
 	--network=host \
 	--volume "/tmp:/usr/src/app/data" \
-	--volume "$XAUTH:/root/.Xauthority" \
         $MATHICS_IMAGE \
 	--mode cli -- $@
