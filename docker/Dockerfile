@@ -26,6 +26,7 @@ RUN python3 -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathi
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
 RUN (cd src/mathics-django && python3 mathics_django/docpipeline.py -o)
+# RUN python3 -m mathics_django.docpipeline.py -o
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v /root/.local/var/mathics/doc_xml_data.pcl /usr/src/app/.local/var/mathics/doc_xml_data.pcl
 
 # RUN python3 -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript
