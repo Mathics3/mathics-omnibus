@@ -1,14 +1,20 @@
 #!/bin/bash
 set -x
 DOCKER=${DOCKER:-docker}
+XAUTH=${XAUTH:-$HOME/.Xauthority}
+touch $XAUTH
 
 TAG=${TAG:-latest}
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 $DOCKER run -it \
 	--rm \
-	--env="DISPLAY" \
+	--env "DISPLAY=$DISPLAY" \
 	--name mathics-cli \
-	--volume="/tmp:/usr/src/app/data" \
+	--tty \
+	--interactive \
+	--network=host \
+	--volume "/tmp:/usr/src/app/data" \
+	--volume "$XAUTH:/root/.Xauthority" \
         $MATHICS_IMAGE \
 	--mode cli -- $@
