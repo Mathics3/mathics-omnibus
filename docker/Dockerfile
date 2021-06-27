@@ -19,18 +19,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
-RUN pip install "Mathics3>=2.2.0"
+RUN pip install "Mathics3[full]>=3.0.0"
 # RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3
-# RUN python3 -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django
-# RUN pip install Mathics-Django
+RUN python3 -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
+# RUN pip install Mathics-Django[full]
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
 RUN (cd src/mathics-django && python3 mathics_django/docpipeline.py -o)
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v /root/.local/var/mathics/doc_xml_data.pcl /usr/src/app/.local/var/mathics/doc_xml_data.pcl
 
 # RUN python3 -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript
-RUN pip install mathicsscript
-RUN (cd src/mathicsscript && make)
+RUN pip install mathicsscript[full]
+# RUN (cd src/mathicsscript && make)
 
 RUN python3 -m nltk.downloader wordnet omw
 RUN python3 -m spacy download en
