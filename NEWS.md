@@ -1,3 +1,10 @@
+3.0.0
+-----
+
+Track changes to Mathics core Django, mathicsscript, and pymathics-graph.
+Numerous docker config changes.
+
+
 2.2.0
 -----
 

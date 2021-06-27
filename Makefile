@@ -14,6 +14,7 @@ TAG ?= latest
 .PHONY: all docker-image \
    check clean \
    rmChangeLog \
+   dist \
    push \
    upload \
    test
@@ -30,6 +31,10 @@ endif
 
 #: Default target - same as "develop"
 all: docker-image
+
+#: Make distirbution: wheels, eggs, tarball
+dist:
+	./admin-tools/make-dist.sh
 
 #: Pull mathics docker image from dockerhub with tag $(TAG). The default tag is "latest".
 docker-pull:
