@@ -2,6 +2,22 @@
 if [ -n "$DEBUG" ]; then
     set -x
 fi
+
+cd $(dirname ${BASH_SOURCE[0]})
+source ./term-background.sh
+
+[[ -x ./term-background.sh ]] && source ./term-background.sh
+
+if [[ $COLORFGBG == '15;0' ]] ; then
+    # Dark background
+    style="--style inkpot"
+
+else
+    # Light background
+    style="--style colorful"
+fi
+
+
 DOCKER=${DOCKER:-docker}
 XAUTH=${XAUTH:-$HOME/.Xauthority}
 touch $XAUTH
@@ -18,4 +34,4 @@ $DOCKER run -it \
 	--network=host \
 	--volume "/tmp:/usr/src/app/data" \
         $MATHICS_IMAGE \
-	--mode cli -- $@
+	--mode cli -- $style $@
