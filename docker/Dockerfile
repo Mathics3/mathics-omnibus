@@ -14,7 +14,7 @@ RUN apt-get update
 RUN apt-get install -qq apt-utils
 # we need libsqlite3-dev now if ubuntu doesn't come with that, we'll need
 # to build our own Python
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-10 llvm-10-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-matplotlib python-matplotlib-data x11-apps
+RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-10 llvm-10-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-matplotlib python-matplotlib-data x11-apps asymptote w3m
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
