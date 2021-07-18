@@ -6,6 +6,7 @@ scripts = [
     "script/dmathics",
     "script/dmathicsserver",
     "script/dmathicsscript",
+    "script/term-background.sh",
 ]
 
 import os.path as osp

@@ -3,6 +3,7 @@ FROM ubuntu:focal
 ENV TZ=US/Eastern
 ENV MATHICS_HOME=/usr/src/app
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
+ENV PYTHON=python3
 
 WORKDIR $MATHICS_HOME
 
@@ -14,24 +15,33 @@ RUN apt-get update
 RUN apt-get install -qq apt-utils
 # we need libsqlite3-dev now if ubuntu doesn't come with that, we'll need
 # to build our own Python
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-10 llvm-10-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-matplotlib python-matplotlib-data x11-apps asymptote w3m
+RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-10 llvm-10-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-matplotlib python-matplotlib-data x11-apps asymptote w3m latexmk texlive-xetex lmodern inkscape texlive-latex-extra texlive-fonts-recommended
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
 RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 
 RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3[full]
-RUN python3 -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
+
+# Some time later, build mathics.pdf
+# We need to work around inkscape crashing due to a lack of an X11 connection.
+# RUN git clone https://github.com/mathics/Mathics.git
+# RUN (cd Mathics && ${PYTHON} ./setup.py develop && make doc)
+
+# RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq texlive-font-utils latexmk texlive-xetex lmodern inkscape texlive-latex-extra texlive-fonts-recommended asymptote
+# RUN SANDBOX=t ${PYTHON} /usr/local/lib/python3.8/dist-packages/mathics/docpipeline.py -ot
+# ... run latex
+RUN ${PYTHON} -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
 
 RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
-RUN (cd src/mathics-django && python3 mathics_django/docpipeline.py -o)
-RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v /root/.local/var/mathics/doc_xml_data.pcl /usr/src/app/.local/var/mathics/doc_xml_data.pcl
+RUN (cd src/mathics-django && ${PYTHON} mathics_django/docpipeline.py -o)
+RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v /root/.local/var/mathics/doc_data.pcl /usr/src/app/.local/var/mathics/doc_data.pcl nodejs
 
-RUN python3 -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
+RUN ${PYTHON} -m pip install -e git://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
 RUN (cd src/mathicsscript && make)
 
-RUN python3 -m nltk.downloader wordnet omw
-RUN python3 -m spacy download en
+RUN ${PYTHON} -m nltk.downloader wordnet omw
+RUN ${PYTHON} -m spacy download en
 
 # debug stuff
 # RUN apt-get install -qq emacs
