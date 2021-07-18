@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Python Setuptools for Mathics via docker."""
+"""Python Setuptools for installation of a suite of Mathics3 PyPI packages."""
 
 from setuptools import setup
 from __pkginfo__ import (
+    EXTRAS_REQUIRE,
     __version__,
     author,
     author_email,
@@ -23,6 +24,7 @@ setup(
     author_email=author_email,
     classifiers=classifiers,
     description=short_desc,
+    extras_require=EXTRAS_REQUIRE,
     scripts=scripts,
     long_description=long_description,
     long_description_content_type="text/x-rst",
