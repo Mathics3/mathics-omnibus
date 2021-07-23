@@ -17,7 +17,7 @@ Arg:
     --pythonpath              This will be added to PYTHONPATH. Example use-case - absolute path to
                               basedir of mathics source code inside container, ie:
                                  mathics src = /usr/src/app/mathics
-                                 --pythonpaht /usr/src/app
+                                 --pythonpath /usr/src/app
 
     -m | --mode {cli|ui|gui|minimal}  Start mathics in web-ui mode (ui or gui), cli mode (cli) or minimal. Default is cli.
                               See: https://github.com/mathics/Mathics/wiki/Installing#running-mathics
