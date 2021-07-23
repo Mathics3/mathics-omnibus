@@ -25,6 +25,11 @@ touch $XAUTH
 TAG=${TAG:-latest}
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
+DEVICE=''
+if [[ -r /dev/dri ]]; then
+    DEVICE='--device=/dev/dri:/dev/dri'
+fi
+
 $DOCKER run -it \
 	--rm \
 	--env "DISPLAY=$DISPLAY" \
@@ -33,5 +38,6 @@ $DOCKER run -it \
 	--interactive \
 	--network=host \
 	--volume "/tmp:/usr/src/app/data" \
+	$DEVICE \
         $MATHICS_IMAGE \
 	--mode cli -- $style $@
