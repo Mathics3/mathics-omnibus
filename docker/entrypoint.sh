@@ -19,11 +19,12 @@ Arg:
                                  mathics src = /usr/src/app/mathics
                                  --pythonpath /usr/src/app
 
-    -m | --mode {cli|ui|gui|minimal|pdf}
+    -m | --mode {cli|ui|gui|minimal|pdf|copy}
                               Start mathics in either:
                                  * web-ui mode (ui or gui),
                                  * cli mode (cli) or minimal.
 								 * viewing manual (pdf) or document
+								 * copy the manual mathics.pdf to the host computer
                               Default is cli.
                               See: https://github.com/mathics/Mathics/wiki/Installing#running-mathics
 
@@ -35,11 +36,15 @@ EOF
 }
 
 mathics_mode=cli
+COPY_DOC=0
 
 while (( $# )) ; do
     case "$1" in
         -h | --help)  help ; exit ;;
-        -m | --mode)  mathics_mode="$2" ; shift 2 ;;
+        -m | --mode)
+			mathics_mode="$2"
+			shift 2
+			;;
         --pythonpath) export PYTHONPATH="$2":$PYTHONPATH ; shift 2 ;;
         --)           shift ; break ;;
         *)            echo "Can't parse '$@'. See '$0 --help'" ; exit 1 ;;
@@ -54,6 +59,10 @@ case $mathics_mode in
 		;;
     document|pdf)
 		evince /usr/src/app/Mathics/mathics/doc/tex/mathics.pdf
+		;;
+    copy)
+		echo "Copying mathics.pdf to host-attached filesystem."
+		cp /usr/src/app/Mathics/mathics/doc/tex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
     ui|gui)
 	echo

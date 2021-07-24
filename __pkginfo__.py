@@ -4,6 +4,8 @@ author = "Rocky Bernstein"
 author_email = "rb@dustyfeet.com"
 scripts = [
     "script/dmathics",
+    "script/dmathicsdoc",
+    "script/dmathicsdoccopy",
     "script/dmathicsserver",
     "script/dmathicsscript",
     "script/term-background.sh",

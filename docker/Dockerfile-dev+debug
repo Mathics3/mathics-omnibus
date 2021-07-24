@@ -1,4 +1,4 @@
-vFROM ubuntu:focal
+FROM ubuntu:focal
 
 ENV TZ=US/Eastern
 ENV MATHICS_HOME=/usr/src/app

@@ -10,12 +10,10 @@ TAG=${TAG:-latest}
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 $DOCKER run -it \
-  --name mathics-doc \
+  --name mathics-copy \
   --rm \
-  --env="DISPLAY" \
   --workdir=/app \
   --volume="$PWD":/app \
-  --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
   --volume="/tmp:/usr/src/app/data" \
   $MATHICS_IMAGE \
-  --mode pdf -- $@
+  --mode copy -- $@

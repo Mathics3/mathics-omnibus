@@ -7,13 +7,15 @@ If you are just interested in the computational library, there is no need for ei
 
 But what if you want both command-line interface, Web interface, all of the Pymathics libraries and whatever else there is to offer?
 
-That's what this repository is about. Here we have a PyPI installable package that pull in the various components and offer commands
+That's what this repository is about. Here we have a PyPI installable package that pull in the various components and offer commands:
 
-* ``mathicsscript`` to run the command-line interface
-* ``mathicsserver`` to run the Django-Web server
-* ``dmathicsscript`` and ``dmathicsserver`` which run the docker version of these.
+* ``mathicsscript`` to run the command-line interface,
+* ``mathicsserver`` to run the Django-Web server,
+* ``dmathicsscript`` and ``dmathicsserver`` which runs the docker version of these,
+* ``dmathicssdoc`` which runs a PDF viewer, `evince <https://wiki.gnome.org/Apps/Evince>`_, which can view the generated reference manual in PDF.
+* ``dmathicssdoc`` which copies the the generated reference PDF manual out of the container and into the host filesystem.
 
-This repository also contains the dockerfiile to create the `mathicsorg/mathics docker images <https://hub.docker.com/repository/docker/mathicsorg/mathics>`_.
+This repository also contains the Dockerfiles used to create the `mathicsorg/mathics docker images <https://hub.docker.com/repository/docker/mathicsorg/mathics>`_.
 
 That image is a combination of:
 
@@ -21,6 +23,7 @@ That image is a combination of:
 * `mathicsscript <https://github.com/Mathics3/mathicsscript>`_
 * `mathics-pygments <https://github.com/Mathics3/mathics-pygments>`_
 * `Mathics-Django <https://github.com/Mathics3/Mathics-Django>`_
+* `mathics-threejs-backend <https://github.com/Mathics3/mathics-threejs-backend>`_
 * `pymathics-natlang <https://github.com/Mathics3/pymathics-natlang>`_
 * `pymathics-graph <https://github.com/Mathics3/pymathics-graph>`_
 
