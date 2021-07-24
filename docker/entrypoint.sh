@@ -4,7 +4,7 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb
 
 script_cmd="${ENTRYPOINT_COMMAND:-$(basename $0)}"
 
-function help() {
+function help {
     cat <<EOF
 
 Usage:
@@ -19,7 +19,12 @@ Arg:
                                  mathics src = /usr/src/app/mathics
                                  --pythonpath /usr/src/app
 
-    -m | --mode {cli|ui|gui|minimal}  Start mathics in web-ui mode (ui or gui), cli mode (cli) or minimal. Default is cli.
+    -m | --mode {cli|ui|gui|minimal|pdf}
+                              Start mathics in either:
+                                 * web-ui mode (ui or gui),
+                                 * cli mode (cli) or minimal.
+								 * viewing manual (pdf) or document
+                              Default is cli.
                               See: https://github.com/mathics/Mathics/wiki/Installing#running-mathics
 
 Params:
@@ -43,10 +48,13 @@ done
 
 case $mathics_mode in
     cli) mathicsscript $@
-	 ;;
+		 ;;
     minimal|mathics)
-	mathics $@
-	;;
+		mathics $@
+		;;
+    document|pdf)
+		evince /usr/src/app/Mathics/mathics/doc/tex/mathics.pdf
+		;;
     ui|gui)
 	echo
 	echo "~~~~ app/data has been mounted to $MATHICS_HOME/data ~~~~"
