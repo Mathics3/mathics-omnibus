@@ -1,7 +1,21 @@
 #!/bin/bash
+set -e
+if [ -n "$DEBUG" ]; then
+    set -x
+fi
+
 DOCKER=${DOCKER:-docker}
 
 TAG=${TAG:-latest}
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+
+for arg in "$@" ; do
+    case "$arg" in
+        -u | -U | --upgrade | upgrade)
+			$DOCKER pull $MATHICS_IMAGE
+			exit $?
+		;;
+    esac
+done
 
 $DOCKER run --rm -it --name mathics-cli -v /tmp:/usr/src/app/data $MATHICS_IMAGE --mode mathics -- $@

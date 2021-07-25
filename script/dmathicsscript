@@ -1,7 +1,23 @@
 #!/bin/bash
+set -e
 if [ -n "$DEBUG" ]; then
     set -x
 fi
+
+# Allow customization using POSIX environment variables:
+DOCKER=${DOCKER:-docker}
+TAG=${TAG:-latest}
+
+MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+
+for arg in $@ ; do
+    case "$arg" in
+        -u | --upgrade | upgrade)
+			$DOCKER pull $MATHICS_IMAGE
+			exit $?
+		;;
+    esac
+done
 
 cd $(dirname ${BASH_SOURCE[0]})
 source ./term-background.sh
@@ -18,19 +34,15 @@ else
 fi
 
 
-DOCKER=${DOCKER:-docker}
 XAUTH=${XAUTH:-$HOME/.Xauthority}
 touch $XAUTH
-
-TAG=${TAG:-latest}
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 DEVICE=''
 if [[ -r /dev/dri ]]; then
     DEVICE='--device=/dev/dri:/dev/dri'
 fi
 
-$DOCKER run -it \
+$DOCKER run \
 	--rm \
 	--env "DISPLAY=$DISPLAY" \
 	--name mathics-cli \

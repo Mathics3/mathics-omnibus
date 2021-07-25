@@ -1,15 +1,25 @@
 #!/bin/bash
+set -e
 if [ -n "$DEBUG" ]; then
     set -x
 fi
+
+TAG=${TAG:-latest}
+MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+
+for arg in "$@" ; do
+    case "$arg" in
+        -u | | -U | --upgrade | upgrade)
+			$DOCKER pull $MATHICS_IMAGE
+			exit $?
+		;;
+    esac
+done
 
 # Allow customization using POSIX environment variables:
 DOCKER=${DOCKER:-docker}
 MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
 MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics/${MATHICS_DJANGO_DB}}
-
-TAG=${TAG:-latest}
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 $DOCKER run -it \
   --name mathics-web \
