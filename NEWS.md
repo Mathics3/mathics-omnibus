@@ -1,3 +1,29 @@
+4.0.0
+-----
+
+# PyPI
+
+Revised for Mathics 4.0.0. See the respective changes in Mathics3, Mathics-Django, and mathicsscript for changes there.
+
+# Docker
+
+
+* we now use `llvm12` and a more recent `gv`
+* there is an `--upgrade` command added to all docker scripts to retrieve/updagte to the latest version
+* More environment variables can be passed through.
+* You can set environment variable `APP_DATADIR` to a directory outside Django to have data persist there. You may want to use this with `MATHIC_DJANGO_PATH` below...
+* In `dmathicsscript`, if you set `MATHICS_DJANGO_DB_PATH` and that file doesn't exist, the system database will be copied to that location. This gives a way for persisting sessions outside of docker.
+
+There is be interaction between `MATHICS_DJANGO_DB_PATH` and `APP_DATADIR` to get the database to persist.
+
+As a simple example, run:
+
+```
+  $ MATHICS_DJANGO_DB_PATH=/usr/src/app/data/foo.sqlite dmathicsserver
+```
+
+Above, since by default `APP_DATADIR` maps `/usr/src/app/data` to `/tmp`, on the host filesystem in `/tmp/mathics-django.sqlite` workspace sessions can be saved.
+
 3.1.0
 -----
 
