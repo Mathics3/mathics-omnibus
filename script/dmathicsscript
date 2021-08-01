@@ -5,14 +5,22 @@ if [ -n "$DEBUG" ]; then
 fi
 
 # Allow customization using POSIX environment variables:
+APP_DATADIR=${APP_DATADIR:-/tmp}
 DOCKER=${DOCKER:-docker}
 TAG=${TAG:-latest}
+
+# TODO: allow setting:
+#	XDG_CONFIG_HOME \
+#	CONFIG_HOME \
+#	CONFIGDIR \
+#	MATHICSSCRIPT_HISTSIZE \
+#	MATHICSSCRIPT_HISTFILE \
 
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 for arg in $@ ; do
     case "$arg" in
-        -u | --upgrade | upgrade)
+        -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
 			exit $?
 		;;
@@ -33,7 +41,6 @@ else
     style="--style colorful"
 fi
 
-
 XAUTH=${XAUTH:-$HOME/.Xauthority}
 touch $XAUTH
 
@@ -49,7 +56,8 @@ $DOCKER run \
 	--tty \
 	--interactive \
 	--network=host \
-	--volume "/tmp:/usr/src/app/data" \
+	--volume="$PWD":/app \
+	--volume "${APP_DATADIR}:/usr/src/app/data" \
 	$DEVICE \
-        $MATHICS_IMAGE \
+    $MATHICS_IMAGE \
 	--mode cli -- $style $@

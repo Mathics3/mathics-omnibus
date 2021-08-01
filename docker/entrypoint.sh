@@ -1,5 +1,8 @@
 #!/bin/bash
 
+DJANGO_DOC_HTML_DATA_PATH="/usr/local/lib/python3.8/dist-packages/mathics_django/doc/doc_html_data.pcl"
+MATHICS_DJANGO_SYSTEM_DB_PATH="/usr/src/app/.local/var/mathics/mathics.sqlite"
+
 export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/src/app/.local/bin
 
 script_cmd="${ENTRYPOINT_COMMAND:-$(basename $0)}"
@@ -69,6 +72,10 @@ case $mathics_mode in
 	echo "~~~~ app/data has been mounted to $MATHICS_HOME/data ~~~~"
 	if [[ -n $MATHICS_DJANGO_DB_PATH ]]; then
 	    echo "~~~~ SQLite data (worksheets, user info) will be stored in $MATHICS_DJANGO_DB_PATH ~~~~"
+		if [[ ! -s $MATHICS_DJANGO_DB_PATH ]] && [[ -n $MATHICS_DJANGO_SYSTEM_DB_PATH ]]; then
+			echo "~~~~ Copying internal SQLite data (worksheets, user info) to location specified in \$MATHICS_DJANGO_DB_PATH"
+			cp -vp $MATHICS_DJANGO_SYSTEM_DB_PATH $MATHICS_DJANGO_DB_PATH
+		fi
 	else
 	    echo "~~~~ SQLite data (worksheets, user info) will be stored in $MATHICS_HOME/data/mathics.sqlite"
 	fi

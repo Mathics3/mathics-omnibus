@@ -19,11 +19,10 @@ RUN apt-get install -qq apt-utils
 # Leave out inkscape  for now.
 
 # inxi and mesa-utils might be optional
-# npm puls in nodejs, but we'll be explicit.
-# llvm-11 and llvm-11-dev might work?
+# npm pulls in nodejs, but we'll be explicit.
 
 # Install lots of packages
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-10 llvm-10-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps asymptote w3m latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince
+RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-12 llvm-12-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps asymptote w3m latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince
 
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
@@ -32,20 +31,37 @@ RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 ################
 # Mathics core #
 ################
-RUN pip install "Mathics3[full]>=3.1.0"
+RUN pip install "Mathics3[full]>=4.0.0"
+
+# We need newer versions of Asymptote and GhostScript for bulding the PDF
+COPY ubuntu-bin/gs /usr/local/bin/
+
+# We would need to copy over a *full asy distribution*
+# COPY ubuntu-bin/asy /usr/local/bin/
+
+# For now, until we package TeX sources skip building PDF and just copy it
+# to the place entrypoint.sh expects it.
+COPY tex-images/mathics.pdf /usr/src/app/data/mathics.pdf
 
 #####################
 # Mathics Pymathics #
 #####################
 
-RUN pip install pymathics-natlang
 RUN pip install pymathics-graph
+
+# natlang installs spacy so this should come first
+RUN pip install pymathics-natlang
+RUN ${PYTHON} -m spacy download en
+RUN ${PYTHON} -m nltk.downloader wordnet omw
 
 ##################
 # Mathicsscript  #
 ##################
 
-RUN ${PYTHON} -m pip install -e mathicsscript[full]
+# prompt toolkit needs an IPython that is newer than what got
+# implicitly installed above
+RUN ${PYTHON} -m pip install 'ipython<8.0,>=7.23.1'
+RUN ${PYTHON} -m pip install mathicsscript[full]
 
 RUN ${PYTHON} -m nltk.downloader wordnet omw
 RUN ${PYTHON} -m spacy download en

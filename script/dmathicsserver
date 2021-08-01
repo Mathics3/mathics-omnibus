@@ -4,31 +4,34 @@ if [ -n "$DEBUG" ]; then
     set -x
 fi
 
+# Allow customization using POSIX environment variables:
+APP_DATADIR=${APP_DATADIR:-/tmp}
+DOCKER=${DOCKER:-docker}
+MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
+MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics/${MATHICS_DJANGO_DB}}
 TAG=${TAG:-latest}
+
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 for arg in "$@" ; do
     case "$arg" in
-        -u | | -U | --upgrade | upgrade)
+        -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
 			exit $?
 		;;
     esac
 done
 
-# Allow customization using POSIX environment variables:
-DOCKER=${DOCKER:-docker}
-MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
-MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics/${MATHICS_DJANGO_DB}}
-
-$DOCKER run -it \
-  --name mathics-web \
-  --rm \
-  --env="DISPLAY" \
-  --env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
-  --workdir=/app \
-  --volume="$PWD":/app \
-  --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-  --volume="/tmp:/usr/src/app/data" \
-  -p 8000:8000 $MATHICS_IMAGE \
-  --mode ui -- $@
+$DOCKER run \
+		-it \
+		--name mathics-django \
+		--rm \
+		--env="DISPLAY" \
+		--env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
+		--workdir=/app \
+		--volume="$PWD":/app \
+		--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+		--volume="${APP_DATADIR}:/usr/src/app/data" \
+		-p 8000:8000 \
+		$MATHICS_IMAGE \
+		--mode ui -- $@
