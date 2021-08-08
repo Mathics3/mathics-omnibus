@@ -4,6 +4,10 @@ if [ -n "$DEBUG" ]; then
     set -x
 fi
 
+# The release name we are configured to run under.
+typeset dmathics_version='1.0.0'
+
+# Allow customization using POSIX environment variables:
 DOCKER=${DOCKER:-docker}
 
 TAG=${TAG:-latest}
@@ -11,11 +15,47 @@ MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 for arg in "$@" ; do
     case "$arg" in
+        -h | --help | help )
+			cat <<_EOH
+usage:
+   dmathics [options]
+
+  A stropped-down command-line interface to Mathics run in a docker container
+
+Options specfic to dmathicsdoc:
+
+  -u | -U | --upgrade | upgrade
+  pull updates to the docker container if there is a new image
+
+  -h| --help | help
+  show this help and exit
+
+  -V| --version
+  show the dmathicsdoc version and exit
+
+_EOH
+			stripped_args+=("--help")
+			;;
         -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
-			exit $?
-		;;
+			;;
+        -v | -V | --version)
+			echo "dmathicsdoc version ${dmathicsdoc_version}"
+			exit 100
+			;;
+		default)
+			stripped_args+=($arg)
     esac
 done
 
-$DOCKER run --rm -it --name mathics-cli -v /tmp:/usr/src/app/data $MATHICS_IMAGE --mode mathics -- $@
+# Show environment variables
+for env_setting in MATHICS_IMAGE; do
+	echo $env_setting = ${!env_setting}
+done
+
+
+$DOCKER run --rm -it \
+		--name mathics-cli \
+		--volume /tmp:/usr/src/app/data \
+		$MATHICS_IMAGE \
+		--mode mathics -- $@

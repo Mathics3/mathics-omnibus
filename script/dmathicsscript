@@ -39,7 +39,7 @@ Usage: mathicsscript [OPTIONS] [FILE]
 
   A command-line interface to Mathics run in a docker container
 
-Options specfic to dmathicsserver:
+Options specfic to dmathicsscript:
 
   -u | -U | --upgrade | upgrade
   Pull updates to the docker container if there is a new image.
@@ -67,7 +67,7 @@ _EOH
         -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
 			;;
-        --dversion)
+        -v | -V | --version)
 			echo "dmathicsserver version ${dmathicsserver_version}"
 			exit 100
 			;;

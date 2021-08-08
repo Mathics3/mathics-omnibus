@@ -22,7 +22,7 @@ RUN apt-get install -qq apt-utils
 # npm pulls in nodejs, but we'll be explicit.
 
 # Install lots of packages
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-12 llvm-12-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps asymptote w3m latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince
+RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-12 llvm-12-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince
 
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
@@ -32,15 +32,19 @@ RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 # Mathics core #
 ################
 RUN pip install "Mathics3[full]>=4.0.0"
+# RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3[full]
+
+# RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg
 
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
-COPY ubuntu-bin/gs /usr/local/bin/
+# COPY ubuntu-dpkg/*.deb /tmp/
+# RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
+# RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
+# RUN dpkg --install /tmp/asymptote_2.70+ds-2_amd64.deb
+# COPY ubuntu-bin/gs /usr/local/bin/
 
-# We would need to copy over a *full asy distribution*
-# COPY ubuntu-bin/asy /usr/local/bin/
-
-# For now, until we package TeX sources skip building PDF and just copy it
-# to the place entrypoint.sh expects it.
+# Skip building PDF and just copy it to the place entrypoint.sh
+# expects it.
 COPY tex-images/mathics.pdf /usr/src/app/data/mathics.pdf
 
 #####################
@@ -63,8 +67,6 @@ RUN ${PYTHON} -m nltk.downloader wordnet omw
 RUN ${PYTHON} -m pip install 'ipython<8.0,>=7.23.1'
 RUN ${PYTHON} -m pip install mathicsscript[full]
 
-RUN ${PYTHON} -m nltk.downloader wordnet omw
-RUN ${PYTHON} -m spacy download en
 
 ##################
 # Mathics Django #
