@@ -1,3 +1,14 @@
+4.0.1
+-----
+
+Front-end Scripts to run docker have been gone over to provide help via `--help`, and set environment variables that allow persistance of session by saving data on the host filesystem.
+
+Docker images now include a version of Asymptote that will build images used in the manual, especially those that use Plot option `Filling` and `Bottom`.
+
+Examples from Mark S Gockenbach's Tutorial for Partial Differential quations: Analytical and Numerical Methods have been added to the Mathics-Django worksheet database.
+
+A bug was fixed in detecting the background use in `dmathicsscript`.
+
 4.0.0
 -----
 
