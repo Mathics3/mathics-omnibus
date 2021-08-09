@@ -15,7 +15,7 @@ That's what this repository is about. Here we have a PyPI installable package th
 * ``mathicsserver`` to run the Django-Web server,
 * ``dmathicsscript`` and ``dmathicsserver`` which runs the docker version of these,
 * ``dmathicssdoc`` which runs a PDF viewer, `evince <https://wiki.gnome.org/Apps/Evince>`_, which can view the generated reference manual in PDF.
-* ``dmathicssdoccopy`` which copies the the generated reference PDF manual out of the container and into the host filesystem.
+* ``dmathicsdoccopy`` which copies the the generated reference PDF manual out of the container and into the host filesystem.
 
 This repository also contains the Dockerfiles used to create the `mathicsorg/mathics docker images <https://hub.docker.com/repository/docker/mathicsorg/mathics>`_.
 
