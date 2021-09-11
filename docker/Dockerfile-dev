@@ -52,14 +52,14 @@ RUN unzip asymptote-2.71-aug15-master.zip
 RUN (cd asymptote-master && bash ./autogen.sh && ./configure && make all && make install)
 
 RUN git clone https://github.com/Mathics3/mathics-core.git
-ENV DATA_DIR=/usr/src/app/Mathics/mathics/doc/tex/
-ENV DOC_USER_TEX_DATA_PATH=/usr/src/app/Mathics/mathics/doc/tex/doc_tex_data.pcl
-ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/Mathics/mathics/doc/tex/doc_html_data.pcl
+ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/tex/
+ENV DOC_USER_TEX_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_tex_data.pcl
+ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_html_data.pcl
 
-COPY tex-images/*.pdf Mathics/mathics/doc/tex/
-ENV DOC_LATEX_FILE=/usr/src/app/Mathics/mathics/doc/tex/documentation.tex
-RUN (cd Mathics && ${PYTHON} ./setup.py develop)
-RUN (cd Mathics && make texdoc || /bin/true)
+COPY tex-images/*.pdf mathics-core/mathics/doc/tex/
+ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
+RUN (cd mathics-core && ${PYTHON} ./setup.py develop)
+RUN (cd mathics-core && make texdoc || /bin/true)
 
 #####################
 # Mathics Pymathics #

@@ -37,15 +37,29 @@ RUN pip install "Mathics3[full]>=4.0.0"
 # RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg
 
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
-# COPY ubuntu-dpkg/*.deb /tmp/
-# RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
-# RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
+COPY ubuntu-dpkg/*.deb /tmp/
+RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
+RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
 # RUN dpkg --install /tmp/asymptote_2.70+ds-2_amd64.deb
 # COPY ubuntu-bin/gs /usr/local/bin/
 
-# Skip building PDF and just copy it to the place entrypoint.sh
-# expects it.
-COPY tex-images/mathics.pdf /usr/src/app/data/mathics.pdf
+#--
+# build Asymptote
+#--
+RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq autoconf libgc-dev bison flex libreadline-dev libcurl4 texinfo libsigsegv2 libcurl4 libcurl3-gnutls libgl-dev freeglut3 unzip
+COPY src/asymptote-2.71-aug15-master.zip .
+RUN unzip asymptote-2.71-aug15-master.zip
+RUN (cd asymptote-master && bash ./autogen.sh && ./configure && make all && make install)
+
+RUN git clone https://github.com/Mathics3/mathics-core.git
+ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/tex/
+ENV DOC_USER_TEX_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_tex_data.pcl
+ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_html_data.pcl
+
+COPY tex-images/*.pdf mathics-core/mathics/doc/tex/
+ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
+RUN (cd mathics-core && ${PYTHON} ./setup.py develop)
+RUN (cd mathics-core && make texdoc || /bin/true)
 
 #####################
 # Mathics Pymathics #
