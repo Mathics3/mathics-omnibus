@@ -29,7 +29,7 @@ Arg:
 								 * viewing manual (pdf) or document
 								 * copy the manual mathics.pdf to the host computer
                               Default is cli.
-                              See: https://github.com/mathics/Mathics/wiki/Installing#running-mathics
+                              See: https://github.com/Mathics3/mathics-core/wiki/Installing#running-mathics
 
 Params:
 

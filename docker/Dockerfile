@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 # Mathics core #
 ################
 RUN pip install "Mathics3[full]>=4.0.0"
-# RUN pip install git+git://github.com/mathics/Mathics.git#egg=Mathics3[full]
+# RUN pip install git+git://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
 # RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg
 

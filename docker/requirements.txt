@@ -26,5 +26,4 @@ scikit-image
 sympy>=1.8
 wordcloud # Used in builtin/image.py by WordCloud()
 # Mathics3>=2.2.0
-git+https://github.com/mathics/Mathics.git#egg=Mathics3
-git+https://github.com/mathics/Mathics
+git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3
