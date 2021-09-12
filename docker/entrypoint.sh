@@ -61,11 +61,11 @@ case $mathics_mode in
 		mathics $@
 		;;
     document|pdf)
-		evince /usr/src/app/Mathics/mathics/doc/tex/mathics.pdf
+		evince /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf
 		;;
     copy)
 		echo "Copying mathics.pdf to host-attached filesystem."
-		cp /usr/src/app/Mathics/mathics/doc/tex/mathics.pdf /usr/src/app/data/mathics.pdf
+		cp /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
     ui|gui)
 	echo
