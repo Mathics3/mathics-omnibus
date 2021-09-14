@@ -84,12 +84,8 @@ RUN ${PYTHON} -m pip install Mathics-Django[full]
 ##################
 EXPOSE 8000
 
-RUN groupadd mathics && \
-    useradd -d $MATHICS_HOME -g mathics -m -s /bin/bash mathics && \
-    mkdir -p $MATHICS_HOME/data && \
-    chown -R mathics:mathics $MATHICS_HOME
+RUN mkdir -p $MATHICS_HOME/data
 
-USER mathics
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 
 ENTRYPOINT ["/entrypoint.sh"]
