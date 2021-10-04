@@ -29,13 +29,14 @@ long_description = read("README.rst") + "\n"
 
 # Setup in EXTRAS_REQUIRE various install options:
 #  mathicsscript_full, etc.
-mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
 django_full = {"ujson",}
+mathics_core_full = {"psutil", "scikit-image", "lxml", "wordcloud", "cython",}
+mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
 pymathics_full = {"pymathics-natlang >= 2.2.0", "pymathics-graph >= 2.3.0",}
 full = mathicsscript_full | django_full | pymathics_full
 
 EXTRAS_REQUIRE = {}
-for field in "mathicsscript_full pymathics_full full".split():
+for field in "mathics_core_full mathicsscript_full pymathics_full full".split():
     EXTRAS_REQUIRE[field] = locals()[field]
 
 PYTHON_VERSION = sys.version_info[0] + (sys.version_info[1] / 10.0)
