@@ -1,6 +1,5 @@
 FROM ubuntu:focal
 
-ENV TZ=US/Eastern
 ENV MATHICS_HOME=/usr/src/app
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
 ENV PYTHON=python3
@@ -22,7 +21,7 @@ RUN apt-get install -qq apt-utils
 # npm pulls in nodejs, but we'll be explicit.
 
 # Install lots of packages
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq liblapack-dev llvm-12 llvm-12-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince gyp
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq liblapack-dev llvm-12 llvm-12-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince gyp
 
 RUN pip install --no-cache-dir -r requirements.txt
 COPY requirements-mathicsscript.txt ./
@@ -34,19 +33,19 @@ RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 RUN pip install "Mathics3[full]>=4.0.0"
 # RUN pip install git+git://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
-# RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg
+# RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg
 
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
-COPY ubuntu-dpkg/*.deb /tmp/
-RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
+# COPY ubuntu-dpkg/*.deb /tmp/
+# RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
+# RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
 # RUN dpkg --install /tmp/asymptote_2.70+ds-2_amd64.deb
 # COPY ubuntu-bin/gs /usr/local/bin/
 
 #--
 # build Asymptote
 #--
-RUN DEBIAN_FRONTEND="noninteractive" TZ="US/Eastern" apt-get install -qq autoconf libgc-dev bison flex libreadline-dev libcurl4 texinfo libsigsegv2 libcurl4 libcurl3-gnutls libgl-dev freeglut3 unzip
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq autoconf libgc-dev bison flex libreadline-dev libcurl4 texinfo libsigsegv2 libcurl4 libcurl3-gnutls libgl-dev freeglut3 unzip
 COPY src/asymptote-2.71-aug15-master.zip .
 RUN unzip asymptote-2.71-aug15-master.zip
 RUN (cd asymptote-master && bash ./autogen.sh && ./configure && make all && make install)
