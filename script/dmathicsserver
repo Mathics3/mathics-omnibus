@@ -37,7 +37,7 @@ Options specfic to dmathicsserver:
   show this help
 
   -V| --version
-  show the dmathicsscript version and exit
+  show the dmathicserver version and exit
 
 We will now pass help along to the docker image. Just a sec...
 
