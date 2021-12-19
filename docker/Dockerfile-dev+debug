@@ -88,7 +88,7 @@ RUN (cd src/mathicsscript && make)
 RUN ${PYTHON} -m pip install -e git://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
 
 RUN (cd src/mathics-django && npm install && make)
-RUN (cd src/mathics-django && ${PYTHON} mathics_django/docpipeline.py -o)
+RUN (cd src/mathics-django && ${PYTHON} mathics_django/docpipeline.py -ok) || true
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
 
 ##################
