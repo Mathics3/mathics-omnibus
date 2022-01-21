@@ -1,4 +1,4 @@
-IPython==5.0.0
+IPython==7.16.3
 colorama
 cython
 django >= 3.2.0
