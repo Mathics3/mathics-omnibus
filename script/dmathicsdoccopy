@@ -15,6 +15,31 @@ for arg in "$@" ; do
         -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
 			exit $?
+        -h | --help | help )
+			cat <<_EOH
+Usage: dmathicscopy [OPTIONS]
+
+  A command-line routine to extract mathics documentation from a Mathics docker container
+
+Options specfic to dmathicsscript:
+
+  -u | -U | --upgrade | upgrade
+  Pull updates to the docker container if there is a new image.
+
+  -h| --help | help
+  Show this help.
+
+Useful Environment Variables:
+
+DOCKER: the name of the docker program to run. The default is: ${DOCKER}
+MATHICS_IMAGE: Mathics image to use. The default is: ${MATHICS_IMAGE}
+TAG: tag used in MATHICS_IMAGE above. The default is: ${TAG}
+XAUTH: .Xauthority file. The default is: ${XAUTH}
+_EOH
+		exit 0
+        -u | -U | --upgrade | upgrade)
+			$DOCKER pull $MATHICS_IMAGE
+			;;
 		;;
     esac
 done

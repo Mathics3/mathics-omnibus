@@ -35,7 +35,7 @@ for arg in "$@" ; do
     case "$arg" in
         -h | --help | help )
 			cat <<_EOH
-Usage: mathicsscript [OPTIONS] [FILE]
+Usage: dmathicsscript [OPTIONS] [FILE]
 
   A command-line interface to Mathics run in a docker container
 
@@ -44,10 +44,10 @@ Options specfic to dmathicsscript:
   -u | -U | --upgrade | upgrade
   Pull updates to the docker container if there is a new image.
 
-  -h| --help | help
+  -h | --help | help
   Show this help.
 
-  --dversion
+  -v | -V | --version
   Show the dmathicsscript version and exit.
 
 Useful Environment Variables:
@@ -66,6 +66,7 @@ _EOH
 			;;
         -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
+			exit $?
 			;;
         -v | -V | --version)
 			echo "dmathicsserver version ${dmathicsserver_version}"
