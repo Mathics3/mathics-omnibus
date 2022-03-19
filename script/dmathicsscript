@@ -35,7 +35,7 @@ for arg in "$@" ; do
     case "$arg" in
         -h | --help | help )
 			cat <<_EOH
-Usage: dmathicsscript [OPTIONS] [FILE]
+Usage: dmathicsscript [OPTIONS]
 
   A command-line interface to Mathics run in a docker container
 
