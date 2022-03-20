@@ -1,6 +1,13 @@
 FROM ubuntu:focal
 
 ENV MATHICS_HOME=/usr/src/app
+
+###  The Asymptote mess ###
+# asymptote version 2.78 is known into work inside docker for mathicsscript while 2.79
+# does not. Asymptote is also used in PDF generation and here newer versions are generally
+# better for that.
+ENV ASY_VERSION=asymptote-2.78
+
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
 ENV PYTHON=python3
 
@@ -39,16 +46,15 @@ RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq librsvg2-bin python3-cs
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
 RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
 RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
-# RUN dpkg --install /tmp/asymptote_2.70+ds-2_amd64.deb
 COPY ubuntu-bin/gs /usr/local/bin/
 
 #--
-# build Asymptote
+# build new version of Asymptote for our docs and for inside mathicsscript. The Ubuntu-distributed asymptote has bugs.
 #--
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq autoconf libgc-dev bison flex libreadline-dev libcurl4 texinfo libsigsegv2 libcurl4 libcurl3-gnutls libcurl4-gnutls-dev libgl-dev freeglut3-dev
-COPY src/asymptote-2.78.src.tgz .
-RUN tar -xpf asymptote-2.78.src.tgz
-RUN (cd asymptote-2.78 && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq autoconf libgc-dev bison flex libreadline-dev libcurl4 texinfo libsigsegv2 libcurl4 libcurl3-gnutls libcurl4-gnutls-dev libgl-dev freeglut3-dev libglm-dev
+COPY src/${ASY_VERSION}.src.tgz .
+RUN tar -xpf ${ASY_VERSION}.src.tgz
+RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
 
 RUN git clone https://github.com/Mathics3/mathics-core.git
 ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/tex/
