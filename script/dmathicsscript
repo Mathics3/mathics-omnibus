@@ -34,7 +34,7 @@ stripped_args=()
 for arg in "$@" ; do
     case "$arg" in
         -h | --help | help )
-			cat <<_EOH
+		cat <<_EOH
 Usage: dmathicsscript [OPTIONS]
 
   A command-line interface to Mathics run in a docker container
@@ -62,18 +62,19 @@ XAUTH: .Xauthority file. The default is: ${XAUTH}
 We will now pass help along to the docker image. Just a sec...
 
 _EOH
-			stripped_args+=("--help")
-			;;
+		stripped_args+=("--help")
+		;;
         -u | -U | --upgrade | upgrade)
-			$DOCKER pull $MATHICS_IMAGE
-			exit $?
-			;;
+		$DOCKER pull $MATHICS_IMAGE
+		exit $?
+		;;
         -v | -V | --version)
-			echo "dmathicsserver version ${dmathicsserver_version}"
-			exit 100
-			;;
-		default)
-			stripped_args+=($arg)
+		echo "dmathicsserver version ${dmathicsserver_version}"
+		exit 100
+		;;
+	* | default)
+		stripped_args+=($arg)
+		;;
     esac
 done
 
