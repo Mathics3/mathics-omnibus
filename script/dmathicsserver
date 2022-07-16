@@ -69,6 +69,7 @@ $DOCKER run \
 		--env="DISPLAY" \
 		--env="ASYMPTOTE_PDFVIEWER=/usr/bin/evince" \
 		--env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
+		--env "PYTHON=pyston" \
 		--workdir=/app \
 		--volume="$PWD":/app \
 		--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \

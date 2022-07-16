@@ -43,7 +43,7 @@ PYTHON_VERSION = sys.version_info[0] + (sys.version_info[1] / 10.0)
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 >= 4.0.0",
+    "Mathics3 >= 5.0.0.dev0,<5.0.1",
     "mathicsscript >= 4.0.0",
     "Mathics-Django >= 4.0.1",
     "pymathics-natlang >= 2.2.0",
@@ -60,4 +60,5 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
