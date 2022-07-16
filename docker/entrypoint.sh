@@ -65,7 +65,7 @@ case $mathics_mode in
 		evince /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf
 		;;
     copy)
-		echo "Copying mathics.pdf to host-attached filesystem."
+		echo "Copying mathics.pdf to host-attached filesystem ${TEMPDIR}."
 		cp /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
     ui|gui)
