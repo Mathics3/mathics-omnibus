@@ -100,6 +100,7 @@ done
 $DOCKER run \
 	--rm \
 	--env "DISPLAY=$DISPLAY" \
+	--env "PYTHON=python3" \
 	--name mathics-cli \
 	--tty \
 	--interactive \

@@ -7,13 +7,9 @@ ipywidgets
 langid
 llvmlite
 lxml
-matplotlib
 mpmath>=1.2.1
-networkx==2.5  # 2.5.1 has dependency on decorator which we can't meet
 nltk
-numpy
 palettable
-pint
 psutil
 pycountry
 pydot
@@ -24,6 +20,4 @@ requests
 requests
 scikit-image
 sympy>=1.8
-wordcloud # Used in builtin/image.py by WordCloud()
-# Mathics3>=2.2.0
 git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3
