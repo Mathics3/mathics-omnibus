@@ -32,18 +32,16 @@ COPY src/pyston_2.3.4_20.04_amd64.deb /tmp/
 RUN dpkg -i /tmp/pyston_2.3.4_20.04_amd64.deb
 ENV PYTHON=pyston
 COPY src/*.whl /tmp/
-RUN pip-pyston install /tmp/*.whl
+RUN pip-pyston install /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
 
 RUN pip install --no-cache-dir -r requirements.txt
-COPY requirements-mathicsscript.txt ./
-RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 COPY ubuntu-dpkg/*.deb /tmp/
 
 ################
 # Mathics core #
 ################
 # RUN pip install "Mathics3[full]>=4.0.0"
-RUN pip install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN pip-pyston install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
 RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg pyqt5-dev-tools
 
@@ -70,16 +68,15 @@ ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
 RUN (cd mathics-core && ${PYTHON} ./setup.py develop)
 RUN (cd mathics-core && make texdoc || /bin/true)
 
-# #####################
-# # Mathics Pymathics #
-# #####################
+# Broken for Mathics 5.x
+# ####################################################
+# # Mathics Pymathics and Pymathics Graph for Django #
 
-RUN pip-pyston install pymathics-graph
-RUN pip-pyston install /tmp/spacy-3.4.0-pyston38-pyston_23_x86_64_linux_gnu-linux_x86_64.whl
-
-RUN pip-pyston install pymathics-natlang
-RUN ${PYTHON} -m spacy download en
-RUN ${PYTHON} -m nltk.downloader wordnet omw
+# RUN pip-pyston install pymathics-graph
+# pymathics-natlang is current broken
+# RUN pip-pyston install pymathics-natlang
+# RUN ${PYTHON} -m spacy download en
+# RUN ${PYTHON} -m nltk.downloader wordnet omw
 
 ##################
 # Mathics Django #
@@ -93,12 +90,20 @@ RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /
 # ##################
 # # Mathicsscript  #
 # ##################
+# Install python 3.10 packages
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y python3 python3-numpy python3-sympy python3-click python3-cryptography python3-psutil python3-dateutil
 
-ENV PYTHON=/usr/bin/python3.10
+ENV PYTHON=/usr/bin/python3
+RUN pip install /tmp/*.py3-none-any.whl
+COPY requirements-mathicsscript.txt ./
+RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
 RUN pip install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
-RUN pip install pymathics-graph
-## Something is funky with spacy, so skip for now
-## RUN pip install pymathics-natlang
+
+# Broken for Mathics 5.x
+# #########################################################
+# # Mathics Pymathics and Pymathics Graph for mathicsscript
+# RUN pip install pymathics-graph
+# RUN pip install pymathics-natlang
 
 # prompt toolkit needs an IPython that is newer than what got
 # implicitly installed above
@@ -130,6 +135,6 @@ RUN groupadd mathics && \
 USER mathics
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 
-ENTRYPOINT ["/usr/local/bin/mathics.sh"]
+# ENTRYPOINT ["/usr/local/bin/mathics.sh"]
 
-CMD ["--help"]
+# CMD ["--help"]
