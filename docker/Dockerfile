@@ -2,13 +2,10 @@ FROM ubuntu:jammy
 
 ENV MATHICS_HOME=/usr/src/app
 
-###  The Asymptote mess ###
-# asymptote version 2.78 is known into work inside docker for mathicsscript while 2.79
-# does not. Asymptote is also used in PDF generation and here newer versions are generally
-# better for that.
-ENV ASY_VERSION=asymptote-2.78
+ENV ASY_VERSION=asymptote-2.81
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 WORKDIR $MATHICS_HOME
 
 COPY requirements.txt ./
@@ -22,8 +19,10 @@ RUN apt-get install -qq apt-utils
 # inxi and mesa-utils might be optional
 # npm pulls in nodejs, but we'll be explicit.
 
+RUN apt-get update -y && apt-get upgrade -y -qq
+
 # Install lots of packages
-RUN DEBIAN_FRONTEND="noninteractive" apt install -y -qq \
+RUN apt-get install -y -qq \
     cargo \
     evince \
     gfortran \
@@ -55,28 +54,35 @@ RUN DEBIAN_FRONTEND="noninteractive" apt install -y -qq \
 
 # Set up Pyston
 COPY src/*_amd64.deb /tmp/
-RUN DEBIAN_FRONTEND="noninteractive" dpkg -i /tmp/*_amd64.deb
+RUN dpkg -i /tmp/*_amd64.deb
+
+# to make docker layers be more usuable in development
+# defer deletion until close to the end
+# RUN rm -fr /tmp*_amd64.deb
+
 ENV PYTHON=pyston
-COPY src/*.whl /tmp/
-RUN pip-pyston install /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
-RUN pip-pyston install --no-cache-dir -r requirements.txt
+ENV PIP=pip-pyston
+RUN $PYTHON -m pip install --upgrade pip
+COPY src/*.py3-none-any.whl src/*pyston_23*.whl /tmp/
+RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
+RUN $PIP install --no-cache-dir -r requirements.txt
 
 ################
 # Mathics core #
 ################
 # RUN pip install "Mathics3[full]>=4.0.0"
-RUN pip-pyston install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
-RUN apt install -y -qq librsvg2-bin pyqt5-dev-tools
+RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
-RUN DEBIAN_FRONTEND="noninteractive" apt install -y -qq freeglut3 libfftw3-double3 libglew2.2 libsigsegv2 ghostscript imagemagick texlive-pstricks
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq freeglut3 libfftw3-double3 libglew2.2 libsigsegv2 ghostscript imagemagick texlive-pstricks
 COPY ubuntu-bin/gs /usr/local/bin/
 
 #--
 # build new version of Asymptote for our docs and for inside mathicsscript. The Ubuntu-distributed asymptote has bugs.
 #--
-RUN apt install -y -qq \
+RUN apt-get install -y -qq \
   autoconf \
   bison \
   flex \
@@ -103,33 +109,35 @@ ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_html_d
 
 COPY tex-images/*.pdf mathics-core/mathics/doc/tex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
-RUN (cd mathics-core && pip-pyston install -e .[full])
-RUN (cd mathics-core && PYTHON=pyston make texdoc || /bin/true)
+RUN (cd mathics-core && $PIP install -e .[full])
+RUN (cd mathics-core && PYTHON=$PYTHON make texdoc || /bin/true)
 
-# Broken for Mathics 5.x
-# ####################################################
-# # Mathics Pymathics and Pymathics Graph for Django #
+####################################################
+# Mathics Pymathics and Pymathics Graph for Django #
 
-# RUN pip-pyston install pymathics-graph
+RUN $PIP install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]  pymathics-graph
 # pymathics-natlang is current broken
-# RUN pip-pyston install pymathics-natlang
+# RUN $PIP install pymathics-natlang
 # RUN ${PYTHON} -m spacy download en
 # RUN ${PYTHON} -m nltk.downloader wordnet omw
 
 ##################
 # Mathics Django #
 ##################
-RUN pyston -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
+RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
 
-RUN (cd src/mathics-django && PIP=pip-pyston make)
-RUN (cd src/mathics-django && pyston mathics_django/docpipeline.py -ok) || true
+RUN (cd src/mathics-django && PIP=$PIP make)
+RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok) || true
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
 
 ##################
 # Mathicsscript  #
 ##################
+
+# Mathicsscript loses functionality with pyston because matplotlib doesn't render
+# images with it
 # Install python 3.10 packages
-RUN DEBIAN_FRONTEND="noninteractive" apt install -y \
+RUn apt-get install -qq -y \
    python3 \
    python3-click \
    python3-cryptography \
@@ -146,16 +154,20 @@ RUN DEBIAN_FRONTEND="noninteractive" apt install -y \
    python3-sympy
 
 ENV PYTHON=/usr/bin/python3
-RUN pip install /tmp/*.py3-none-any.whl
+ENV PIP=pip3
+RUN $PYTHON -m pip install --upgrade pip
+RUN $PIP install /tmp/*.py3-none-any.whl
 COPY requirements-mathicsscript.txt ./
-RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
-RUN pip install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
+RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
 # Broken for Mathics 5.x
 # #########################################################
 # # Mathics Pymathics and Pymathics Graph for mathicsscript
 # RUN pip install pymathics-graph
 # RUN pip install pymathics-natlang
+
+
 
 # prompt toolkit needs an IPython that is newer than what got
 # implicitly installed above
@@ -168,12 +180,16 @@ RUN (cd src/mathicsscript && make)
 ##################
 # debug stuff    #
 ##################
-RUN apt install -y -qq emacs
+RUN apt-get install -y -qq emacs
 RUN pip install trepan3k
 
 ##################
 # Finish up      #
 ##################
+
+# Cleanup
+RUN rm -fr /tmp*_amd64.deb /tmp/*.whl
+
 COPY entrypoint.sh /usr/local/bin/mathics-omnibus.sh
 RUN chmod +x /usr/local/bin/mathics-omnibus.sh
 

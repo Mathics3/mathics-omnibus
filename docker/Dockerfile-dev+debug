@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 ENV MATHICS_HOME=/usr/src/app
 
@@ -9,12 +9,8 @@ ENV MATHICS_HOME=/usr/src/app
 ENV ASY_VERSION=asymptote-2.78
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
-ENV PYTHON=python3
-
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 WORKDIR $MATHICS_HOME
-
-COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
 
 COPY requirements.txt ./
 RUN apt-get update
@@ -27,31 +23,85 @@ RUN apt-get install -qq apt-utils
 # inxi and mesa-utils might be optional
 # npm pulls in nodejs, but we'll be explicit.
 
-# Install lots of packages
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq liblapack-dev llvm-12 llvm-12-dev llvm-11 llvm-11-dev gfortran maria libmysqlclient-dev sqlite3 python3-pip python3-setuptools git python3-numpy python3-matplotlib python-matplotlib-data x11-apps latexmk texlive-xetex lmodern texlive-latex-extra texlive-fonts-recommended nodejs npm xserver-xorg-video-all libgl1-mesa-glx libgl1-mesa-dri mesa-utils evince gyp
+RUN apt-get update -y && apt-get upgrade -y -qq
 
-RUN pip install --no-cache-dir -r requirements.txt
-COPY requirements-mathicsscript.txt ./
-RUN pip install --no-cache-dir -r requirements-mathicsscript.txt
-COPY ubuntu-dpkg/*.deb /tmp/
+# Install lots of packages
+RUN apt-get install -y -qq \
+    cargo \
+    evince \
+    gfortran \
+    git x11-apps \
+    gyp \
+    latexmk texlive-xetex \
+    libffi7 \
+    libgl1-mesa-dri \
+    libgl1-mesa-glx \
+    liblapack-dev \
+    libmysqlclient-dev \
+    libopenblas-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    llvm-11 \
+    llvm-11-dev \
+    llvm-12 \
+    llvm-12-dev \
+    lmodern texlive-latex-extra \
+    maria \
+    mesa-utils \
+    nodejs \
+    npm \
+    rustc \
+    sqlite3 \
+    texlive-fonts-recommended \
+    tk8.6-blt2.5 \
+    xserver-xorg-video-all
+
+# Set up Pyston
+COPY src/*_amd64.deb /tmp/
+RUN dpkg -i /tmp/*_amd64.deb
+
+# to make docker layers be more usuable in development
+# defer deletion until close to the end
+# RUN rm -fr /tmp*_amd64.deb
+
+ENV PYTHON=pyston
+ENV PIP=pip-pyston
+RUN $PYTHON -m pip install --upgrade pip
+COPY src/*.py3-none-any.whl src/*pyston_23*.whl /tmp/
+RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
+RUN $PIP install --no-cache-dir -r requirements.txt
 
 ################
 # Mathics core #
 ################
 # RUN pip install "Mathics3[full]>=4.0.0"
-RUN pip install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq librsvg2-bin python3-cson python3-pyqt5 python3-pyqt5.qtsvg
+RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
-RUN dpkg --install /tmp/libgc1_8.0.4-3_amd64.deb /tmp/libgsl25_2.6+dfsg-2_amd64.deb /tmp/libgslcblas0_2.6+dfsg-2_amd64.deb
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq freeglut3 libfftw3-double3 libglew2.1 libsigsegv2 ghostscript imagemagick texlive-pstricks
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq freeglut3 libfftw3-double3 libglew2.2 libsigsegv2 ghostscript imagemagick texlive-pstricks
 COPY ubuntu-bin/gs /usr/local/bin/
 
 #--
 # build new version of Asymptote for our docs and for inside mathicsscript. The Ubuntu-distributed asymptote has bugs.
 #--
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -qq autoconf libgc-dev bison flex libreadline-dev libcurl4 texinfo libsigsegv2 libcurl4 libcurl3-gnutls libcurl4-gnutls-dev libgl-dev freeglut3-dev libglm-dev
+RUN apt-get install -y -qq \
+  autoconf \
+  bison \
+  flex \
+  freeglut3-dev \
+  libcurl3-gnutls \
+  libcurl4 \
+  libcurl4 \
+  libcurl4-gnutls-dev \
+  libgc-dev \
+  libgl-dev \
+  libglm-dev \
+  libreadline-dev \
+  libsigsegv2 \
+  texinfo
+
 COPY src/${ASY_VERSION}.src.tgz .
 RUN tar -xpf ${ASY_VERSION}.src.tgz
 RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
@@ -63,23 +113,66 @@ ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_html_d
 
 COPY tex-images/*.pdf mathics-core/mathics/doc/tex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
-RUN (cd mathics-core && ${PYTHON} ./setup.py develop)
-RUN (cd mathics-core && make texdoc || /bin/true)
+RUN (cd mathics-core && $PIP install -e .[full])
+RUN (cd mathics-core && PYTHON=$PYTHON make texdoc || /bin/true)
 
-#####################
-# Mathics Pymathics #
-#####################
+# Broken for Mathics 5.x
+# ####################################################
+# # Mathics Pymathics and Pymathics Graph for Django #
 
-RUN pip install pymathics-graph
+# RUN $PIP install pymathics-graph
+# pymathics-natlang is current broken
+# RUN $PIP install pymathics-natlang
+# RUN ${PYTHON} -m spacy download en
+# RUN ${PYTHON} -m nltk.downloader wordnet omw
 
-# natlang installs spacy so this should come first
-RUN pip install pymathics-natlang
-RUN ${PYTHON} -m spacy download en
-RUN ${PYTHON} -m nltk.downloader wordnet omw
+##################
+# Mathics Django #
+##################
+RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
+
+RUN (cd src/mathics-django && PIP=$PIP make)
+RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok) || true
+RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
 
 ##################
 # Mathicsscript  #
 ##################
+
+# Mathicsscript loses functionality with pyston because matplotlib doesn't render
+# images with it
+# Install python 3.10 packages
+RUn apt-get install -qq -y \
+   python3 \
+   python3-click \
+   python3-cryptography \
+   python3-cson \
+   python3-dateutil \
+   python3-matplotlib \
+   python-matplotlib-data \
+   python3-numpy \
+   python3-pip \
+   python3-psutil \
+   python3-pyqt5 \
+   python3-pyqt5.qtsvg \
+   python3-setuptools \
+   python3-sympy
+
+ENV PYTHON=/usr/bin/python3
+ENV PIP=pip3
+RUN $PYTHON -m pip install --upgrade pip
+RUN $PIP install /tmp/*.py3-none-any.whl
+COPY requirements-mathicsscript.txt ./
+RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
+RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+
+# Broken for Mathics 5.x
+# #########################################################
+# # Mathics Pymathics and Pymathics Graph for mathicsscript
+# RUN pip install pymathics-graph
+# RUN pip install pymathics-natlang
+
+
 
 # prompt toolkit needs an IPython that is newer than what got
 # implicitly installed above
@@ -90,23 +183,21 @@ RUN ${PYTHON} -m pip install -e git+https://github.com/Mathics3/mathicsscript#eg
 RUN (cd src/mathicsscript && make)
 
 ##################
-# Mathics Django #
-##################
-RUN ${PYTHON} -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
-
-RUN (cd src/mathics-django && npm install && make)
-RUN (cd src/mathics-django && ${PYTHON} mathics_django/docpipeline.py -ok) || true
-RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
-
-##################
 # debug stuff    #
 ##################
-RUN apt-get install -qq emacs
+RUN apt-get install -y -qq emacs
 RUN pip install trepan3k
 
 ##################
 # Finish up      #
 ##################
+
+# Cleanup
+RUN rm -fr /tmp*_amd64.deb /tmp/*.whl
+
+COPY entrypoint.sh /usr/local/bin/mathics-omnibus.sh
+RUN chmod +x /usr/local/bin/mathics-omnibus.sh
+
 EXPOSE 8000
 
 RUN groupadd mathics && \
@@ -117,6 +208,6 @@ RUN groupadd mathics && \
 USER mathics
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
 CMD ["--help"]

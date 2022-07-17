@@ -45,11 +45,12 @@ IS_PYPY = "__pypy__" in sys.builtin_module_names
 install_requires = [
     "Mathics3 >= 5.0.0.dev0,<5.0.1",
     "mathicsscript >= 4.0.0",
-    "Mathics-Django >= 4.0.1",
+    "Mathics-Django > 4.0.2",
     "pymathics-natlang >= 2.2.0",
     "pymathics-graph >= 2.3.0",
 ]
 
+packages=["mathics_omnibus", "script"]
 py_modules = None
 short_desc = "A Collection Mathics components to provide the full Mathics experience"
 url = "http://github.com/Mathics3/mathics-omnibus"
