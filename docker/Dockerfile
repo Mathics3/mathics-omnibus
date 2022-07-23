@@ -46,6 +46,7 @@ RUN apt-get install -y -qq \
     mesa-utils \
     nodejs \
     npm \
+    pkg-config \
     rustc \
     sqlite3 \
     texlive-fonts-recommended \
@@ -85,6 +86,7 @@ COPY ubuntu-bin/gs /usr/local/bin/
 RUN apt-get install -y -qq \
   autoconf \
   bison \
+  file \
   flex \
   freeglut3-dev \
   libcurl3-gnutls \
@@ -115,11 +117,10 @@ RUN (cd mathics-core && PYTHON=$PYTHON make texdoc || /bin/true)
 ####################################################
 # Mathics Pymathics and Pymathics Graph for Django #
 
-RUN $PIP install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]  pymathics-graph
-# pymathics-natlang is current broken
-# RUN $PIP install pymathics-natlang
-# RUN ${PYTHON} -m spacy download en
-# RUN ${PYTHON} -m nltk.downloader wordnet omw
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+RUN ${PYTHON} -m spacy download en
+RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ##################
 # Mathics Django #
@@ -127,7 +128,7 @@ RUN $PIP install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fi
 RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
 
 RUN (cd src/mathics-django && PIP=$PIP make)
-RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok) || true
+RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
 
 ##################
@@ -161,13 +162,12 @@ COPY requirements-mathicsscript.txt ./
 RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
 RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
 
-# Broken for Mathics 5.x
-# #########################################################
-# # Mathics Pymathics and Pymathics Graph for mathicsscript
-# RUN pip install pymathics-graph
-# RUN pip install pymathics-natlang
-
-
+#########################################################
+# Mathics Pymathics and Pymathics Graph for mathicsscript
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+RUN ${PYTHON} -m spacy download en
+RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 # prompt toolkit needs an IPython that is newer than what got
 # implicitly installed above
