@@ -203,6 +203,12 @@ RUN groupadd mathics && \
 USER mathics
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 
+RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
+RUN pyston -m spacy download en_core_web_sm
+RUN pyston -m nltk.downloader wordnet omw-1.4
+
+
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
 CMD ["--help"]
