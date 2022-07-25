@@ -119,7 +119,7 @@ RUN (cd mathics-core && PYTHON=$PYTHON make texdoc || /bin/true)
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ##################
@@ -166,7 +166,7 @@ RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[f
 # Mathics Pymathics and Pymathics Graph for mathicsscript
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 # prompt toolkit needs an IPython that is newer than what got
@@ -203,9 +203,9 @@ RUN groupadd mathics && \
 USER mathics
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 
-RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
-RUN pyston -m spacy download en_core_web_sm
+RUN pyston -m spacy download en_core_web_md
 RUN pyston -m nltk.downloader wordnet omw-1.4
 
 
