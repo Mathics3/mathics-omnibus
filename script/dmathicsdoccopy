@@ -6,6 +6,7 @@ fi
 
 # Allow customization using POSIX environment variables:
 DOCKER=${DOCKER:-docker}
+TEMPDIR=${TMPDIR:-/tmp}
 
 TAG=${TAG:-latest}
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
@@ -15,6 +16,7 @@ for arg in "$@" ; do
         -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
 			exit $?
+			;;
         -h | --help | help )
 			cat <<_EOH
 Usage: dmathicscopy [OPTIONS]
@@ -36,19 +38,19 @@ MATHICS_IMAGE: Mathics image to use. The default is: ${MATHICS_IMAGE}
 TAG: tag used in MATHICS_IMAGE above. The default is: ${TAG}
 XAUTH: .Xauthority file. The default is: ${XAUTH}
 _EOH
-		exit 0
+		exit 0 ;;
         -u | -U | --upgrade | upgrade)
 			$DOCKER pull $MATHICS_IMAGE
 			;;
-		;;
     esac
 done
 
 $DOCKER run -it \
   --name mathics-copy \
+  --env "TEMPDIR=$TEMPDIR" \
   --rm \
   --workdir=/app \
   --volume="$PWD":/app \
-  --volume="/tmp:/usr/src/app/data" \
+  --volume="${TEMPDIR}:/usr/src/app/data" \
   $MATHICS_IMAGE \
   --mode copy -- $@

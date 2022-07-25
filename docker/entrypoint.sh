@@ -1,4 +1,5 @@
 #!/bin/bash
+# This is the docker entry point and gets installed as /usr/local/bin/mathics.sh
 
 DJANGO_DOC_HTML_DATA_PATH="/usr/local/lib/python3.8/dist-packages/mathics_django/doc/doc_html_data.pcl"
 MATHICS_DJANGO_SYSTEM_DB_PATH="/usr/src/app/.local/var/mathics/mathics.sqlite"
@@ -64,7 +65,7 @@ case $mathics_mode in
 		evince /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf
 		;;
     copy)
-		echo "Copying mathics.pdf to host-attached filesystem."
+		echo "Copying mathics.pdf to host-attached filesystem ${TEMPDIR}."
 		cp /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
     ui|gui)
@@ -81,7 +82,7 @@ case $mathics_mode in
 	fi
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo
-	mathicsserver -e $@ ;;
+	/usr/bin/mathicsserver -e $@ ;;
     shell)  /bin/bash ;;
     *)   echo "unknown mathics_mode=$mathics_mode. See '$script_cmd --help'" ; exit 2 ;;
 esac

@@ -4,29 +4,46 @@ if [ -n "$DEBUG" ]; then
     set -x
 fi
 
-# The release name we are configured to run under.
-typeset dmathicsserver_version='1.0.0'
 
+# The release name we are configured to run under.
+# FIXME: get from mathics_omnibus_version
+typeset dmathicsserver_version='5.0.0.dev0'
+
+#########################################################
 # Allow customization using POSIX environment variables:
-APP_DATADIR=${APP_DATADIR:-/tmp}
+#########################################################
+
+APP_DATADIR=${APP_DATADIR:-/tmp}  #
+
+CONFIGDIR=${CONFIGDIR:-$HOME/.config/mathicsscript/}
+
+# Graphics Device that mathicsscript will use to output graphics
+if [[ -r /dev/dri ]]; then
+    DEFAULT_GRAPHICS_DEVICE='--device=/dev/dri:/dev/dri'
+fi
+GRAPHICS_DEVICE=${DEFAULT_GRAPHICS_DEVICE:-''}
+
 DOCKER=${DOCKER:-docker}
+
+# TODO: allow setting:
+#	MATHICSSCRIPT_HISTSIZE \
+
+# MPLCONFIGDIR is the workspace and configuration directory for matplotlib
+MPLCONFIGDIR=${MPLCONFIGDIR:-/tmp}
+
+# Docker tag we use by default
 TAG=${TAG:-latest}
 
 XAUTH=${XAUTH:-$HOME/.Xauthority}
 touch $XAUTH
 
-DEVICE=''
-if [[ -r /dev/dri ]]; then
-    DEVICE='--device=/dev/dri:/dev/dri'
-fi
-
-CONFIGDIR=${CONFIGDIR:-$HOME/.config/mathicsscript/}
-
-
-# TODO: allow setting:
-#	MATHICSSCRIPT_HISTSIZE \
-
+# Docker mathics contianer we use.
+# Note: has to come af we set after TAG
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+
+
+# end customization section
+#########################################################
 
 typeset -a stripped_args
 stripped_args=()
@@ -100,6 +117,8 @@ done
 $DOCKER run \
 	--rm \
 	--env "DISPLAY=$DISPLAY" \
+	--env "PYTHON=python3" \
+	--env "MPLCONFIGDIR=${MPLCONFIGDIR}" \
 	--name mathics-cli \
 	--tty \
 	--interactive \
@@ -107,6 +126,6 @@ $DOCKER run \
 	--volume="$PWD":/app \
 	--volume "${APP_DATADIR}:/usr/src/app/data" \
 	--volume "${CONFIGDIR}:/usr/src/app/.config/mathicsscript" \
-	$DEVICE \
+	$GRAPHICS_DEVICE \
     $MATHICS_IMAGE \
 	--mode cli -- $style $stripped_args

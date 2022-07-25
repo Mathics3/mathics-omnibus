@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """Python Setuptools for installation of a suite of Mathics3 PyPI packages."""
@@ -12,6 +11,7 @@ from __pkginfo__ import (
     classifiers,
     install_requires,
     long_description,
+    packages,
     scripts,
     short_desc,
     url,
@@ -28,6 +28,7 @@ setup(
     scripts=scripts,
     long_description=long_description,
     long_description_content_type="text/x-rst",
+    packages=packages,
     install_requires=install_requires,
     url=url,
 )
