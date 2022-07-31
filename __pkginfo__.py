@@ -32,22 +32,21 @@ long_description = read("README.rst") + "\n"
 django_full = {"ujson",}
 mathics_core_full = {"psutil", "scikit-image", "lxml", "wordcloud", "cython",}
 mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
-pymathics_full = {"pymathics-natlang >= 5.0.0.dev0", "pymathics-graph >= 5.0.0.dev0",}
+pymathics_full = {"pymathics-natlang >= 5.0.0", "pymathics-graph >= 5.0.0a0",}
 full = mathicsscript_full | django_full | pymathics_full
 
 EXTRAS_REQUIRE = {}
 for field in "mathics_core_full mathicsscript_full pymathics_full full".split():
     EXTRAS_REQUIRE[field] = locals()[field]
 
-PYTHON_VERSION = sys.version_info[0] + (sys.version_info[1] / 10.0)
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 >= 5.0.0.dev0,<5.0.1",
-    "mathicsscript >= 5.0.0.dev0",
-    "Mathics-Django >= 5.0.0.dev0",
-    "pymathics-natlang >= 5.0.0.dev0",
-    "pymathics-graph >= 5.0.0.dev0",
+    "Mathics3 >= 5.0.0.dev0,<5.1.0",
+    "mathicsscript >= 5.0.0",
+    "Mathics-Django >= 5.0.0",
+    "pymathics-natlang >= 5.0.0",
+    "pymathics-graph >= 5.0.0a0",
 ]
 
 packages=["mathics_omnibus", "script"]

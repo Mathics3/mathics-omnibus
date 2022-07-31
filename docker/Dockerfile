@@ -71,8 +71,8 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 ################
 # Mathics core #
 ################
-# RUN pip install "Mathics3[full]>=4.0.0"
-RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+# RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN pip install "Mathics3[full]>=5.0.0"
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -111,25 +111,33 @@ ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_html_d
 
 COPY tex-images/*.pdf mathics-core/mathics/doc/tex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
+COPY src/documentation.tex mathics-core/mathics/doc/tex/documentation.tex
+COPY src/version-info.tex mathics-core/mathics/doc/tex/
 RUN (cd mathics-core && $PIP install -e .[full])
-RUN (cd mathics-core && PYTHON=$PYTHON make texdoc || /bin/true)
+RUN (cd mathics-core/mathics/doc/tex && latexmk --verbose -f -pdf -pdflatex="xelatex" -halt-on-error mathics)
 
 ####################################################
 # Mathics Pymathics and Pymathics Graph for Django #
 
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+RUN $PIP install "pymathics-graph>=5.0.0a0"
+
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+RUN $PIP install "pymathics-natlang>=5.0.0"
+
 RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ##################
 # Mathics Django #
 ##################
-RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
+# RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
+RUN $PYTHON -m pip install "Mathics-Django[full]>=5.0.0"
 
-RUN (cd src/mathics-django && PIP=$PIP make)
+# RUN (cd src/mathics-django && PIP=$PIP make)
 RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
-RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
+COPY src/doc_html_data.pcl doc_html_data.pcl
+RUN mkdir -p /usr/src/app/.local/var/mathics && mv -v doc_html_data.pcl /usr/src/app/.local/var/mathics/doc_data_html.pcl
 
 ##################
 # Mathicsscript  #
@@ -160,12 +168,17 @@ RUN $PYTHON -m pip install --upgrade pip
 RUN $PIP install /tmp/*.py3-none-any.whl
 COPY requirements-mathicsscript.txt ./
 RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
-RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+# RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN pip install "Mathics3[full]>=5.0.0"
 
 #########################################################
 # Mathics Pymathics and Pymathics Graph for mathicsscript
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+RUN $PIP install "pymathics-graph>=5.0.0a0"
+
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+RUN $PIP install "pymathics-natlang>=5.0.0"
+
 RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
@@ -177,15 +190,15 @@ RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 RUN ${PYTHON} -m pip install -e git+https://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
 RUN (cd src/mathicsscript && make)
 
-##################
-# debug stuff    #
-##################
-RUN apt-get install -y -qq emacs
-RUN pip install trepan3k
+# ##################
+# # debug stuff    #
+# ##################
+# RUN apt-get install -y -qq emacs
+# RUN pip install trepan3k
 
-##################
-# Finish up      #
-##################
+# ##################
+# # Finish up      #
+# ##################
 
 # Cleanup
 RUN rm -fr /tmp*_amd64.deb /tmp/*.whl
