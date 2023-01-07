@@ -47,9 +47,20 @@ MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
 
 typeset -a stripped_args
 stripped_args=()
-
-for arg in "$@" ; do
+e_args=()
+typeset -a args
+typeset -i n=$#
+for ((i=1; i<=n; i++)) ; do
+    arg=$1
+    shift
     case "$arg" in
+	-e)
+	    # for -e we need to quote its argument
+	    e_args[0]="-e"
+	    e_args[1]=$1
+	    shift
+	    ((i+=1))
+	    ;;
         -h | --help | help )
 		cat <<_EOH
 Usage: dmathicsscript [OPTIONS]
@@ -90,7 +101,7 @@ _EOH
 		exit 100
 		;;
 	* | default)
-		stripped_args+=($arg)
+		stripped_args[$i]=$arg
 		;;
     esac
 done
@@ -128,4 +139,4 @@ $DOCKER run \
 	--volume "${CONFIGDIR}:/usr/src/app/.config/mathicsscript" \
 	$GRAPHICS_DEVICE \
     $MATHICS_IMAGE \
-	--mode cli -- $style $stripped_args
+	--mode cli -- $style ${stripped_args[@]} ${e_args[0]} "${e_args[1]}"
