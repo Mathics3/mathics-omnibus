@@ -71,6 +71,8 @@ RUN apt-get install -y -qq \
 
 RUN apt-get install -y -qq python3 python3-pip
 
+# ENV MAKE=make
+ENV MAKE=remake
 ENV PYTHON=python3
 ENV PIP=pip3
 RUN $PYTHON -m pip install --upgrade pip
@@ -92,6 +94,7 @@ RUN (cd src/mathics-scanner && make)
 
 RUN git clone https://github.com/Mathics3/mathics-core
 RUN (cd mathics-core && make)
+RUN (cd mathics-core && pip install -e .[full])
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -133,13 +136,14 @@ ENV DOC_LATEX_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
 ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/latex/doc_html_data.pcl
 
-COPY tex-images/*.pdf src/mathics-core/mathics/doc/latex/
-RUN ls -l src/mathics-core/mathics/doc/latex/
+COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
+RUN ls -l mathics-core/mathics/doc/latex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
+# Use this when we hand-hack the doc.
 # COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
-RUN ls -l src/mathics-core/mathics/doc/latex/
-RUN (cd mathics-core/mathics/doc/latex && DOC_TEX_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/latex/doc_tex_data.pcl PYTHON=$PYTHON remake -x texdoc || /bin/true)
-RUN ls -l src/mathics-core/mathics/doc/latex/
+RUN ls -l mathics-core/mathics/doc/latex/
+RUN (cd mathics-core/mathics/doc/latex && DOC_TEX_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/latex/doc_tex_data.pcl PYTHON=$PYTHON $MAKE texdoc || /bin/true)
+# RUN ls -l mathics-core/mathics/doc/latex/
 
 ####################################################
 # Mathics Pymathics and Pymathics Graph for Django #
@@ -155,7 +159,7 @@ RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 ##################
 RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
 
-RUN (cd src/mathics-django && PIP=$PIP make)
+RUN (cd src/mathics-django && PIP=$PIP $MAKE)
 # We need -ok since we what Unicode in PCL but tests assume ASCII
 RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
@@ -204,7 +208,7 @@ RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 
 # RUN ${PYTHON} -m pip install mathicsscript[full]
 RUN ${PYTHON} -m pip install -e git+https://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
-RUN (cd src/mathicsscript && make)
+RUN (cd src/mathicsscript && $MAKE)
 
 ##################
 # debug stuff    #
@@ -235,8 +239,9 @@ RUN chown -v -R mathics:mathics /usr/src/app/.local/var/mathics/mathics.sqlite
 
 USER mathics
 
-# # RUN ${PYTHON} -m spacy download en_core_web_sm
-# # RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
+# When Python for mathicsscript is different than Python for mathics-docker
+# RUN ${PYTHON} -m spacy download en_core_web_sm
+# RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
