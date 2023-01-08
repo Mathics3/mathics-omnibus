@@ -49,6 +49,7 @@ RUN apt-get install -y -qq \
     pkg-config \
     rustc \
     sqlite3 \
+    tesseract-ocr \
     texlive-fonts-recommended \
     tk8.6-blt2.5 \
     xserver-xorg-video-all

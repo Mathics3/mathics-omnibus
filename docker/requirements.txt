@@ -18,6 +18,7 @@ pygments>=2.4.1 # To upgrade. Required very indirectly by jupyterlab-pygments. O
 python-dateutil
 requests
 requests
-scikit-image
 sympy>=1.8
+git+https://github.com/Mathics3/mathics-scanner.git#egg=Mathics_Scanner[full]
 git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3
+scikit-image

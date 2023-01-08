@@ -42,7 +42,7 @@ for field in "mathics_core_full mathicsscript_full pymathics_full full".split():
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 >= 5.0.2.dev0,<5.1.0",
+    "Mathics3 >= 5.0.3.dev0,<5.1.0",
     "mathicsscript >= 5.0.0",
     "Mathics-Django >= 5.0.0",
     "pymathics-natlang >= 5.0.0",
@@ -51,7 +51,7 @@ install_requires = [
 
 packages=["mathics_omnibus", "script"]
 py_modules = None
-short_desc = "A Collection Mathics components to provide the full Mathics experience"
+short_desc = "A Collection Mathics3 components to provide the full Mathics3 experience"
 url = "http://github.com/Mathics3/mathics-omnibus"
 
 classifiers = [
