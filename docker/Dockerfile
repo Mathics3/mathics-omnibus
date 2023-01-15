@@ -61,23 +61,22 @@ RUN apt-get install -y -qq \
     tk8.6-blt2.5 \
     xserver-xorg-video-all
 
-# # Set up Pyston
-# COPY src/*_amd64.deb /tmp/
-# RUN dpkg -i /tmp/*_amd64.deb
+# Set up Pyston
+COPY src/*_amd64.deb /tmp/
+RUN dpkg -i /tmp/*_amd64.deb
+ENV PYTHON=pyston
 
 # to make docker layers be more usuable in development
 # defer deletion until close to the end
 # RUN rm -fr /tmp*_amd64.deb
 
-RUN apt-get install -y -qq python3 python3-pip
-
 # ENV MAKE=make
 ENV MAKE=remake
-ENV PYTHON=python3
-ENV PIP=pip3
+ENV PIP=pip-pyston
 RUN $PYTHON -m pip install --upgrade pip
-# COPY src/*.py3-none-any.whl src/*pyston_23*.whl /tmp/
-# RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
+
+COPY src/*.py3-none-any.whl src/*pyston_23*.whl /tmp/
+RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
 RUN $PIP install --no-cache-dir -r requirements.txt
 
 ####################################################
@@ -168,37 +167,40 @@ RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /
 # Mathicsscript  #
 ##################
 
-# # Mathicsscript loses functionality with pyston because matplotlib doesn't render
-# # images with it
-# # Install python 3.10 packages
-# RUn apt-get install -qq -y \
-#    python3 \
-#    python3-click \
-#    python3-cryptography \
-#    python3-cson \
-#    python3-dateutil \
-#    python3-matplotlib \
-#    python-matplotlib-data \
-#    python3-numpy \
-#    python3-pip \
-#    python3-psutil \
-#    python3-pyqt5 \
-#    python3-pyqt5.qtsvg \
-#    python3-setuptools \
-#    python3-sympy
+# Mathicsscript loses functionality with pyston because matplotlib doesn't render
+# images with it
+# Install python 3.10 packages
+RUN apt-get install -y -qq python3 python3-pip
+ENV PYTHON=python3
 
-# ENV PYTHON=/usr/bin/python3
-# ENV PIP=pip3
-# RUN $PYTHON -m pip install --upgrade pip
-# RUN $PIP install /tmp/*.py3-none-any.whl
+RUN apt-get install -qq -y \
+   python3 \
+   python3-click \
+   python3-cryptography \
+   python3-cson \
+   python3-dateutil \
+   python3-matplotlib \
+   python-matplotlib-data \
+   python3-numpy \
+   python3-pip \
+   python3-psutil \
+   python3-pyqt5 \
+   python3-pyqt5.qtsvg \
+   python3-setuptools \
+   python3-sympy
+
+ENV PIP=pip3
+RUN $PYTHON -m pip install --upgrade pip
+RUN $PIP install /tmp/*.py3-none-any.whl
 COPY requirements-mathicsscript.txt ./
 RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
-# RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
+RUN (cd mathics-core && $PIP install -e .[full])
 
 #########################################################
 # Mathics Pymathics and Pymathics Graph for mathicsscript
-# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
 RUN ${PYTHON} -m spacy download en_core_web_sm
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
@@ -207,8 +209,8 @@ RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 
 # RUN ${PYTHON} -m pip install mathicsscript[full]
-RUN ${PYTHON} -m pip install -e git+https://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
-RUN (cd src/mathicsscript && $MAKE)
+RUN git clone https://github.com/Mathics3/mathicsscript.git src/mathicsscript
+RUN (cd src/mathicsscript && PYTHON=$PYTHON $MAKE)
 
 ##################
 # debug stuff    #
@@ -225,7 +227,6 @@ RUN rm -fr /tmp*_amd64.deb /tmp/*.whl
 
 COPY entrypoint.sh /usr/local/bin/mathics-omnibus.sh
 RUN chmod +x /usr/local/bin/mathics-omnibus.sh
-RUN ln -vs /usr/local/bin/mathicsserver /usr/bin/mathicsserver
 
 EXPOSE 8000
 
@@ -240,8 +241,8 @@ RUN chown -v -R mathics:mathics /usr/src/app/.local/var/mathics/mathics.sqlite
 USER mathics
 
 # When Python for mathicsscript is different than Python for mathics-docker
-# RUN ${PYTHON} -m spacy download en_core_web_sm
-# RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
+RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
