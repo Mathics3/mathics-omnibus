@@ -92,8 +92,8 @@ RUN (cd src/mathics-scanner && make)
 ################
 
 RUN git clone https://github.com/Mathics3/mathics-core
-RUN (cd mathics-core && make)
-RUN (cd mathics-core && pip install -e .[full])
+RUN (cd mathics-core && $MAKE)
+RUN (cd mathics-core && $PIP install -e .[full])
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -210,6 +210,8 @@ RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 
 # RUN ${PYTHON} -m pip install mathicsscript[full]
 RUN git clone https://github.com/Mathics3/mathicsscript.git src/mathicsscript
+RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
+RUN (cd mathics-core && pip install -e .[full])
 RUN (cd src/mathicsscript && PYTHON=$PYTHON $MAKE)
 
 ##################
