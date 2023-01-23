@@ -85,7 +85,7 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 
 # We need to do this until the next release
 RUN git clone https://github.com/Mathics3/mathics-scanner.git src/mathics-scanner
-RUN (cd src/mathics-scanner && make)
+RUN (cd src/mathics-scanner && $MAKE)
 
 ################
 # Mathics core #
@@ -94,6 +94,7 @@ RUN (cd src/mathics-scanner && make)
 RUN git clone https://github.com/Mathics3/mathics-core
 RUN (cd mathics-core && $MAKE)
 RUN (cd mathics-core && $PIP install -e .[full])
+RUN (cd mathics-core && $PYTHON ./setup.py develop)
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -156,16 +157,18 @@ RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 ##################
 # Mathics Django #
 ##################
-RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
+RUN git clone https://github.com/Mathics3/mathics-django
+RUN (cd mathics-django && $MAKE)
+RUN (cd mathics-django && $PIP install -e .[full])
+RUN (cd mathics-django && $PYTHON ./setup.py develop)
 
-RUN (cd src/mathics-django && PIP=$PIP $MAKE)
 # We need -ok since we what Unicode in PCL but tests assume ASCII
-RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
+RUN (cd mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
 RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
 
-##################
-# Mathicsscript  #
-##################
+# ##################
+# # Mathicsscript  #
+# ##################
 
 # Mathicsscript loses functionality with pyston because matplotlib doesn't render
 # images with it
@@ -211,7 +214,7 @@ RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 # RUN ${PYTHON} -m pip install mathicsscript[full]
 RUN git clone https://github.com/Mathics3/mathicsscript.git src/mathicsscript
 RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
-RUN (cd mathics-core && pip install -e .[full])
+RUN (cd mathics-core && $PIP install -e .[full])
 RUN (cd src/mathicsscript && PYTHON=$PYTHON $MAKE)
 
 ##################
