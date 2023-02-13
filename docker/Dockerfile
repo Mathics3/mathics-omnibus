@@ -131,10 +131,10 @@ RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make
 ####################################################
 
 ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
-ENV DOC_LATEX_DATA_PCL=/usr/src/app/mathics-core/mathics/doc/latex/doc_latex_data.pcl
+ENV DOCTEST_LATEX_DATA_PCL=/usr/src/app/mathics-core/mathics/doc/latex/doctest_latex_data.pcl
 ENV DOC_LATEX_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
-ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/latex/doc_html_data.pcl
+ENV DOCTEST_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/latex/doctest_html_data.pcl
 
 COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
 RUN ls -l mathics-core/mathics/doc/latex/
@@ -163,8 +163,8 @@ RUN (cd mathics-django && $PIP install -e .[full])
 RUN (cd mathics-django && $PYTHON ./setup.py develop)
 
 # We need -ok since we what Unicode in PCL but tests assume ASCII
-RUN (cd mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
-RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
+RUN (cd mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting --load-module pymathics.graph,pymathics.natlang) || true
+RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOCTEST_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doctest_data.pcl
 
 # ##################
 # # Mathicsscript  #
