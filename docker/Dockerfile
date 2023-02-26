@@ -84,17 +84,25 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 ####################################################
 
 # We need to do this until the next release
-RUN git clone https://github.com/Mathics3/mathics-scanner.git src/mathics-scanner
-RUN (cd src/mathics-scanner && $MAKE)
+# RUN git clone https://github.com/Mathics3/mathics-scanner.git src/mathics-scanner
+# RUN (cd src/mathics-scanner && $MAKE)
+
+RUN $PIP install Mathics-Scanner[full]
 
 ################
 # Mathics core #
 ################
 
+# We need the source to build docs, even though
+# we install vai Python package. This is a bug in mathics-core
+# packaging.
 RUN git clone https://github.com/Mathics3/mathics-core
-RUN (cd mathics-core && $MAKE)
-RUN (cd mathics-core && $PIP install -e .[full])
-RUN (cd mathics-core && $PYTHON ./setup.py develop)
+RUN (cd mathics-core && $MAKE) # create op tables
+
+# RUN (cd mathics-core && $PIP install -e .[full])
+# RUN (cd mathics-core && $PYTHON ./setup.py develop)
+
+RUN $PIP install Mathics3[full]
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -149,18 +157,29 @@ RUN (cd mathics-core/mathics/doc/latex && DOC_TEX_DATA_PATH=/usr/src/app/mathics
 # Mathics Pymathics and Pymathics Graph for Django #
 ####################################################
 
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+
+RUN $PIP install pymathics-graph[full]
+RUN $PIP install pymathics-natlang[full]
+
 RUN ${PYTHON} -m spacy download en_core_web_sm
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ##################
 # Mathics Django #
 ##################
+
+# As for Mathics-core, We need the source to build docs, even though
+# we install via Python package. This is a bug in mathics-core
+# packaging.
 RUN git clone https://github.com/Mathics3/mathics-django
 RUN (cd mathics-django && $MAKE)
-RUN (cd mathics-django && $PIP install -e .[full])
-RUN (cd mathics-django && $PYTHON ./setup.py develop)
+
+# RUN (cd mathics-django && $PIP install -e .[full])
+# RUN (cd mathics-django && $PYTHON ./setup.py develop)
+
+RUN $PIP install Mathics-Django[full]
 
 # We need -ok since we what Unicode in PCL but tests assume ASCII
 RUN (cd mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting --load-module pymathics.graph,pymathics.natlang) || true
@@ -195,15 +214,23 @@ RUN apt-get install -qq -y \
 ENV PIP=pip3
 RUN $PYTHON -m pip install --upgrade pip
 RUN $PIP install /tmp/*.py3-none-any.whl
-COPY requirements-mathicsscript.txt ./
-RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
-RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
-RUN (cd mathics-core && $PIP install -e .[full])
+
+# COPY requirements-mathicsscript.txt ./
+# RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
+# RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
+# RUN (cd mathics-core && $PIP install -e .[full])
+
+RUN $PIP install mathics-scanner[full]
 
 #########################################################
+
 # Mathics Pymathics and Pymathics Graph for mathicsscript
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+
+RUN $PIP install pymathics-graph[full]
+RUN $PIP install pymathics-natlang[full]
+
 RUN ${PYTHON} -m spacy download en_core_web_sm
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
@@ -212,16 +239,19 @@ RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 
 # RUN ${PYTHON} -m pip install mathicsscript[full]
-RUN git clone https://github.com/Mathics3/mathicsscript.git src/mathicsscript
-RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
-RUN (cd mathics-core && $PIP install -e .[full])
-RUN (cd src/mathicsscript && PYTHON=$PYTHON $MAKE)
 
-##################
-# debug stuff    #
-##################
-RUN apt-get install -y -qq emacs
-RUN pip install trepan3k
+# RUN git clone https://github.com/Mathics3/mathicsscript.git src/mathicsscript
+# RUN (cd src/mathics-scanner && PYTHON=$PYTHON make)
+# RUN (cd mathics-core && $PIP install -e .[full])
+# RUN (cd src/mathicsscript && PYTHON=$PYTHON $MAKE)
+
+RUN $PIP install mathicsscript[full]
+
+# ##################
+# # debug stuff    #
+# ##################
+# RUN apt-get install -y -qq emacs
+# RUN pip install trepan3k
 
 ##################
 # Finish up      #
