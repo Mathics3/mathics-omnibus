@@ -45,6 +45,8 @@ install_requires = [
     "Mathics3 >=6.0.0",
     "mathicsscript >= 6.0.0",
     "Mathics-Django >= 6.0.0",
+    # Mathics3 6.0.0 accidentally omitted Pillow > 9.2
+    "pillow >= 9.2.0",
 ]
 
 packages=["mathics_omnibus", "script"]
