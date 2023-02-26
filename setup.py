@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
 
-"""Python Setuptools for installation of a suite of Mathics3 PyPI packages."""
+"""
+Python setup for installation of a suite of Mathics3 omnibus  PyPI package.
+
+variations that can apperar in inside [] of "pip install mathics-omnibus[...]"
+
+* core-full: all mathics-core options
+* django-full: all mathics-core options
+* mathicsscript-full: all mathics-script options
+* Mathics3-Modules-full: all Mathics3 modules
+* full: - all of the above
+"""
 
 from setuptools import setup
 from __pkginfo__ import (

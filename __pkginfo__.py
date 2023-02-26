@@ -27,17 +27,28 @@ def read(*rnames):
 exec(read("mathics_omnibus/version.py"))
 long_description = read("README.rst") + "\n"
 
-# Setup in EXTRAS_REQUIRE various install options:
 #  mathicsscript_full, etc.
 django_full = {"ujson",}
-mathics_core_full = {"psutil", "scikit-image", "lxml", "wordcloud", "cython",}
-mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
-pymathics_full = {"pymathics-natlang >= 6.0.0", "pymathics-graph >= 6.0.0",}
-full = mathicsscript_full | django_full | pymathics_full
 
-EXTRAS_REQUIRE = {}
-for field in "mathics_core_full mathicsscript_full pymathics_full full".split():
-    EXTRAS_REQUIRE[field] = locals()[field]
+# All mathics-core enhancement options
+mathics_core_full = {"psutil", "scikit-image", "lxml", "wordcloud", "cython",}
+
+# All mathicsscript enhancement options
+mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
+
+# All Mathics3 Modules
+mathics3_modules_full = {"pymathics-natlang >= 6.0.0", "pymathics-graph >= 6.0.0",}
+
+# options you can give in ... of:
+#    pip install mathics_omnibus[...]
+
+EXTRAS_REQUIRE = {
+    "core-full": mathics_core_full,
+    "django_full": django_full,
+    "mathicsscript-full": mathicsscript_full,
+    "Mathics3-Modules-full": mathics3_modules_full,
+    "full": mathics_core_full | django_full | mathicsscript_full | mathics3_modules_full
+    }
 
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
