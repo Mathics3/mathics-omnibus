@@ -134,6 +134,18 @@ COPY src/${ASY_VERSION}.src.tgz .
 RUN tar -xpf ${ASY_VERSION}.src.tgz
 RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
 
+#######################################
+# Mathics Pymathics and Pymathics Graph
+#######################################
+
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+
+RUN $PIP install pymathics-graph
+RUN $PIP install pymathics-natlang[full]
+
+RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 ####################################################
 # Mathics core docs
 ####################################################
@@ -153,18 +165,6 @@ RUN ls -l mathics-core/mathics/doc/latex/
 RUN (cd mathics-core/mathics/doc/latex && DOC_TEX_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/latex/doc_tex_data.pcl PYTHON=$PYTHON $MAKE texdoc || /bin/true)
 # RUN ls -l mathics-core/mathics/doc/latex/
 
-####################################################
-# Mathics Pymathics and Pymathics Graph for Django #
-####################################################
-
-# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-# RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-
-RUN $PIP install pymathics-graph[full]
-RUN $PIP install pymathics-natlang[full]
-
-RUN ${PYTHON} -m spacy download en_core_web_sm
-RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 ##################
 # Mathics Django #
@@ -228,7 +228,7 @@ RUN $PIP install mathics-scanner[full]
 # RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
 # RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
 
-RUN $PIP install pymathics-graph[full]
+RUN $PIP install pymathics-graph
 RUN $PIP install pymathics-natlang[full]
 
 RUN ${PYTHON} -m spacy download en_core_web_sm
@@ -250,8 +250,8 @@ RUN $PIP install mathicsscript[full]
 # ##################
 # # debug stuff    #
 # ##################
-# RUN apt-get install -y -qq emacs
-# RUN pip install trepan3k
+RUN apt-get install -y -qq emacs
+RUN pip install trepan3k
 
 ##################
 # Finish up      #
@@ -273,11 +273,11 @@ RUN groupadd mathics && \
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 RUN chown -v -R mathics:mathics /usr/src/app/.local/var/mathics/mathics.sqlite
 
-USER mathics
-
 # When Python for mathicsscript is different than Python for mathics-docker
 RUN ${PYTHON} -m spacy download en_core_web_sm
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
+
+USER mathics
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
