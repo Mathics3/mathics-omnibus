@@ -32,7 +32,7 @@ long_description = read("README.rst") + "\n"
 django_full = {"ujson",}
 mathics_core_full = {"psutil", "scikit-image", "lxml", "wordcloud", "cython",}
 mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
-pymathics_full = {"pymathics-natlang >= 5.0.0", "pymathics-graph >= 5.0.0a0",}
+pymathics_full = {"pymathics-natlang >= 6.0.0", "pymathics-graph >= 6.0.0",}
 full = mathicsscript_full | django_full | pymathics_full
 
 EXTRAS_REQUIRE = {}
@@ -42,11 +42,11 @@ for field in "mathics_core_full mathicsscript_full pymathics_full full".split():
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 >= 5.0.2.dev0,<5.1.0",
-    "mathicsscript >= 5.0.0",
-    "Mathics-Django >= 5.0.0",
-    "pymathics-natlang >= 5.0.0",
-    "pymathics-graph >= 5.0.0a0",
+    "Mathics3 >= 6.0.0.dev0,<6.1.0",
+    "mathicsscript >= 6.0.0",
+    "Mathics-Django >= 6.0.0",
+    "pymathics-natlang >= 6.0.0",
+    "pymathics-graph >= 6.0.0",
 ]
 
 packages=["mathics_omnibus", "script"]
@@ -56,9 +56,9 @@ url = "http://github.com/Mathics3/mathics-omnibus"
 
 classifiers = [
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
