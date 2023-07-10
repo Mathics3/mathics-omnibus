@@ -62,11 +62,11 @@ case $mathics_mode in
 		mathics $@
 		;;
     document|pdf)
-		evince /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf
+		evince /usr/src/app/mathics-core/mathics/doc/latex/mathics.pdf
 		;;
     copy)
 		echo "Copying mathics.pdf to host-attached filesystem ${TEMPDIR}."
-		cp /usr/src/app/mathics-core/mathics/doc/tex/mathics.pdf /usr/src/app/data/mathics.pdf
+		cp /usr/src/app/mathics-core/mathics/doc/latex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
     ui|gui)
 	echo
@@ -82,7 +82,7 @@ case $mathics_mode in
 	fi
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo
-	/usr/bin/mathicsserver -e $@ ;;
+	mathicsserver -e $@ ;;
     shell)  /bin/bash ;;
     *)   echo "unknown mathics_mode=$mathics_mode. See '$script_cmd --help'" ; exit 2 ;;
 esac

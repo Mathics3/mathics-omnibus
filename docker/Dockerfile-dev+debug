@@ -2,7 +2,7 @@ FROM ubuntu:jammy
 
 ENV MATHICS_HOME=/usr/src/app
 
-ENV ASY_VERSION=asymptote-2.81
+ENV ASY_VERSION=asymptote-2.83
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -47,6 +47,7 @@ RUN apt-get install -y -qq \
     nodejs \
     npm \
     pkg-config \
+    python3-pip \
     rustc \
     sqlite3 \
     texlive-fonts-recommended \
@@ -61,18 +62,18 @@ RUN dpkg -i /tmp/*_amd64.deb
 # defer deletion until close to the end
 # RUN rm -fr /tmp*_amd64.deb
 
-ENV PYTHON=pyston
-ENV PIP=pip-pyston
+ENV PYTHON=python3.10
+ENV PIP=/usr/bin/pip3.10
 RUN $PYTHON -m pip install --upgrade pip
-COPY src/*.py3-none-any.whl src/*pyston_23*.whl /tmp/
-RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*pyston_23*.whl
+COPY src/*.py3-none-any.whl src/*x86_64*.whl /tmp/
+RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*x86_64.whl
 RUN $PIP install --no-cache-dir -r requirements.txt
 
 ################
 # Mathics core #
 ################
-# RUN pip install "Mathics3[full]>=4.0.0"
-RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+# RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+# RUN pip install "Mathics3[full]>=6.0.1"
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -105,31 +106,45 @@ RUN tar -xpf ${ASY_VERSION}.src.tgz
 RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
 
 RUN git clone https://github.com/Mathics3/mathics-core.git
-ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/tex/
-ENV DOC_USER_TEX_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_tex_data.pcl
-ENV DOC_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/tex/doc_html_data.pcl
+ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
+ENV DOCTEST_LATEX_DATA_PCL=/usr/src/app/mathics-core/mathics/doc/latex/doctext_latex_data.pcl
+ENV DOCTEST_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/doc_html_data.pcl
 
-COPY tex-images/*.pdf mathics-core/mathics/doc/tex/
-ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/tex/documentation.tex
+COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
+ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
+COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
+COPY src/version-info.tex mathics-core/mathics/doc/latex/
 RUN (cd mathics-core && $PIP install -e .[full])
-RUN (cd mathics-core && PYTHON=$PYTHON make texdoc || /bin/true)
+RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
 
 ####################################################
 # Mathics Pymathics and Pymathics Graph for Django #
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-RUN ${PYTHON} -m spacy download en_core_web_sm
-RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
+# RUN $PIP install "pymathics-graph>=6.0.0"
 
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+# RUN $PIP install "pymathics-natlang>=6.0.0"
+
+RUN $PIP install spacy
+RUN $PYTHON -m spacy download en_core_web_sm
+RUN $PIP install nltk
+RUN $PYTHON -m nltk.downloader wordnet omw-1.4
+
+RUN (cd mathics-core && PYTHON=$PYTHON make doc) || /bin/true
 ##################
 # Mathics Django #
 ##################
-RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django@graphics3d-fixup#egg=Mathics-Django[full]
+RUN git clone https://github.com/Mathics3/mathics-django.git
+RUN (cd mathics-django && $PIP install -e .[full])
 
-RUN (cd src/mathics-django && PIP=$PIP make)
+# RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
+# RUN $PYTHON -m pip install "Mathics-Django[full]>=6.0.0"
+
+# RUN (cd src/mathics-django && PIP=$PIP make)
 RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
-RUN mkdir -p /usr/src/app/.local/var/mathics && cp -v $DOC_USER_HTML_DATA_PATH /usr/src/app/.local/var/mathics/doc_data.pcl
+COPY src/doc_html_data.pcl doc_html_data.pcl
+RUN mkdir -p /usr/src/app/.local/var/mathics && mv -v doc_html_data.pcl /usr/src/app/.local/var/mathics/doc_data_html.pcl
 
 ##################
 # Mathicsscript  #
@@ -154,19 +169,12 @@ RUn apt-get install -qq -y \
    python3-setuptools \
    python3-sympy
 
-ENV PYTHON=/usr/bin/python3
-ENV PIP=pip3
-RUN $PYTHON -m pip install --upgrade pip
-RUN $PIP install /tmp/*.py3-none-any.whl
 COPY requirements-mathicsscript.txt ./
 RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
-RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
+RUN git clone https://github.com/Mathics3/mathicsscript.git
+RUN (cd mathicsscript && PYTHON=$PYTHON make install)
 
-#########################################################
-# Mathics Pymathics and Pymathics Graph for mathicsscript
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 # prompt toolkit needs an IPython that is newer than what got
@@ -181,7 +189,8 @@ RUN (cd src/mathicsscript && make)
 # debug stuff    #
 ##################
 RUN apt-get install -y -qq emacs
-RUN pip install trepan3k
+# RUN pip install trepan3k
+RUN pip install remake
 
 ##################
 # Finish up      #

@@ -11,13 +11,15 @@ GIT2CL ?= admin-tools/git2cl
 RM  ?= rm
 TAG ?= latest
 
-.PHONY: all docker-image \
+.PHONY: all \
    check clean \
-   rmChangeLog \
    dist \
+   docker-image \
+   docker-image-quick \
    push \
-   upload \
-   test
+   rmChangeLog \
+   test \
+   upload
 
 SANDBOX	?=
 ifeq ($(OS),Windows_NT)
