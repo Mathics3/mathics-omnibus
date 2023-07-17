@@ -73,7 +73,7 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 # Mathics core #
 ################
 # RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
-# RUN pip install "Mathics3[full]>=6.0.1"
+# RUN pip install "Mathics3[full]>=6.2.0"
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -121,10 +121,10 @@ RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
 # Mathics Pymathics and Pymathics Graph for Django #
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-# RUN $PIP install "pymathics-graph>=6.0.0"
+# RUN $PIP install "pymathics-graph>=6.2.0"
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-# RUN $PIP install "pymathics-natlang>=6.0.0"
+# RUN $PIP install "pymathics-natlang>=6.2.0"
 
 RUN $PIP install spacy
 RUN $PYTHON -m spacy download en_core_web_sm
@@ -139,7 +139,7 @@ RUN git clone https://github.com/Mathics3/mathics-django.git
 RUN (cd mathics-django && $PIP install -e .[full])
 
 # RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
-# RUN $PYTHON -m pip install "Mathics-Django[full]>=6.0.0"
+# RUN $PYTHON -m pip install "Mathics-Django[full]>=6.2.0"
 
 # RUN (cd src/mathics-django && PIP=$PIP make)
 RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true

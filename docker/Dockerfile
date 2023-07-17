@@ -2,7 +2,8 @@ FROM ubuntu:jammy
 
 ENV MATHICS_HOME=/usr/src/app
 
-ENV ASY_VERSION=asymptote-2.83
+ENV ASY_VERSION=asymptote-2.85
+ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -73,7 +74,7 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 # Mathics core #
 ################
 # RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
-# RUN pip install "Mathics3[full]>=6.0.1"
+# RUN pip install "Mathics3[full]>=6.2.0"
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -86,6 +87,7 @@ COPY ubuntu-bin/gs /usr/local/bin/
 #--
 RUN apt-get install -y -qq \
   autoconf \
+  asymptote \
   bison \
   file \
   flex \
@@ -101,9 +103,9 @@ RUN apt-get install -y -qq \
   libsigsegv2 \
   texinfo
 
-COPY src/${ASY_VERSION}.src.tgz .
-RUN tar -xpf ${ASY_VERSION}.src.tgz
-RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
+# COPY src/${ASY_VERSION}.src.tgz .
+# RUN tar -xpf ${ASY_VERSION}.src.tgz
+# RUN (cd ${ASY_VERSION} && bash ./autogen.sh && ./configure --disable-lsp && make -j3 all && make -j3 install)
 
 RUN git clone https://github.com/Mathics3/mathics-core.git
 ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
@@ -112,8 +114,6 @@ ENV DOCTEST_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/doc_html_d
 
 COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
-COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
-COPY src/version-info.tex mathics-core/mathics/doc/latex/
 RUN (cd mathics-core && $PIP install -e .[full])
 RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
 
@@ -121,25 +121,29 @@ RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
 # Mathics Pymathics and Pymathics Graph for Django #
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-# RUN $PIP install "pymathics-graph>=6.0.0"
+# RUN $PIP install "pymathics-graph>=6.2.0"
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-# RUN $PIP install "pymathics-natlang>=6.0.0"
+# RUN $PIP install "pymathics-natlang>=6.2.0"
 
 RUN $PIP install spacy
 RUN $PYTHON -m spacy download en_core_web_sm
 RUN $PIP install nltk
 RUN $PYTHON -m nltk.downloader wordnet omw-1.4
 
-RUN (cd mathics-core && PYTHON=$PYTHON make doc) || /bin/true
+# This is a mess. Figure out how to make doc.
+COPY src/mathics.pdf mathics-core/mathics/doc/latex/mathics.pdf
+# RUN (cd mathics-core/mathics/doc/latex && PYTHON=$PYTHON make mathics.pdf) || /bin/true
 ##################
 # Mathics Django #
 ##################
 RUN git clone https://github.com/Mathics3/mathics-django.git
 RUN (cd mathics-django && $PIP install -e .[full])
+# Get threejs version created
+RUN (cd mathics-django && make build)
 
 # RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
-# RUN $PYTHON -m pip install "Mathics-Django[full]>=6.0.0"
+# RUN $PYTHON -m pip install "Mathics-Django[full]>=6.2.0"
 
 # RUN (cd src/mathics-django && PIP=$PIP make)
 RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true

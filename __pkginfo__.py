@@ -1,4 +1,5 @@
 import sys
+import os.path as osp
 
 author = "Rocky Bernstein"
 author_email = "rb@dustyfeet.com"
@@ -10,8 +11,6 @@ scripts = [
     "script/dmathicsscript",
     "script/term-background.sh",
 ]
-
-import os.path as osp
 
 
 def get_srcdir():
@@ -32,7 +31,7 @@ long_description = read("README.rst") + "\n"
 django_full = {"ujson",}
 mathics_core_full = {"psutil", "scikit-image", "lxml", "wordcloud", "cython",}
 mathicsscript_full = {"PyYAML", "PyQT5", "cairosvg", "ujson",}
-pymathics_full = {"pymathics-natlang >= 6.0.0", "pymathics-graph >= 6.0.0",}
+pymathics_full = {"pymathics-natlang >= 6.2.0", "pymathics-graph >= 6.2.0",}
 full = mathicsscript_full | django_full | pymathics_full
 
 EXTRAS_REQUIRE = {}
@@ -42,11 +41,11 @@ for field in "mathics_core_full mathicsscript_full pymathics_full full".split():
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 >= 6.0.0.dev0,<6.1.0",
-    "mathicsscript >= 6.0.0",
-    "Mathics-Django >= 6.0.0",
-    "pymathics-natlang >= 6.0.0",
-    "pymathics-graph >= 6.0.0",
+    "Mathics3 >= 7.0.0.dev0,<7.1.0",
+    "mathicsscript >= 6.2.0",
+    "Mathics-Django >= 6.2.0",
+    "pymathics-natlang >= 6.2.0",
+    "pymathics-graph >= 6.2.0",
 ]
 
 packages=["mathics_omnibus", "script"]
