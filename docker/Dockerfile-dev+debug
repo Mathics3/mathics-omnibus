@@ -2,7 +2,8 @@ FROM ubuntu:jammy
 
 ENV MATHICS_HOME=/usr/src/app
 
-ENV ASY_VERSION=asymptote-2.83
+ENV ASY_VERSION=asymptote-2.85
+ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -73,7 +74,7 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 # Mathics core #
 ################
 # RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
-# RUN pip install "Mathics3[full]>=6.2.1"
+# RUN pip install "Mathics3[full]>=7.0.0"
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
@@ -137,6 +138,8 @@ RUN (cd mathics-core && PYTHON=$PYTHON make doc) || /bin/true
 ##################
 RUN git clone https://github.com/Mathics3/mathics-django.git
 RUN (cd mathics-django && $PIP install -e .[full])
+# Get threejs version created
+RUN (cd mathics-django && make build)
 
 # RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
 # RUN $PYTHON -m pip install "Mathics-Django[full]>=6.2.0"
@@ -209,14 +212,14 @@ RUN groupadd mathics && \
     mkdir -p $MATHICS_HOME/data && \
     chown -R mathics:mathics $MATHICS_HOME
 
-USER mathics
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
+run chown -vR mathics:mathics /usr/src/app/.local/var/mathics/mathics.sqlite
+USER mathics
 
-RUN ${PYTHON} -m spacy download en_core_web_sm
+RUN ${PYTHON} -m spacy download en_core_web_md
 RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 RUN pyston -m spacy download en_core_web_sm
 RUN pyston -m nltk.downloader wordnet omw-1.4
-
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 

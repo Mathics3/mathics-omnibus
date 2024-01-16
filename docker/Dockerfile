@@ -74,7 +74,7 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 # Mathics core #
 ################
 # RUN $PIP install git+https://github.com/Mathics3/mathics-core.git#egg=Mathics3[full]
-# RUN pip install "Mathics3[full]>=6.2.0"
+# RUN pip install "Mathics3[full]>=7.0.0"
 
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
