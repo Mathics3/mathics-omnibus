@@ -2,7 +2,7 @@ FROM ubuntu:jammy
 
 ENV MATHICS_HOME=/usr/src/app
 
-ENV ASY_VERSION=asymptote-2.86
+ENV ASY_VERSION=asymptote-2.78
 ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
@@ -114,12 +114,6 @@ ENV DOCTEST_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/doc_html_d
 
 COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
 ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
-# COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
-# COPY src/version-info.tex mathics-core/mathics/doc/latex/
-
-# pyston_lite_autoload Works for 3.7 - 3.10 only
-RUN $PIP install -U pyston_lite_autoload numpy SciPy scikit-image
-
 RUN (cd mathics-core && $PIP install -e .[full])
 RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
 
@@ -163,7 +157,7 @@ RUN mkdir -p /usr/src/app/.local/var/mathics && mv -v doc_html_data.pcl /usr/src
 # Mathicsscript loses functionality with pyston because matplotlib doesn't render
 # images with it
 # Install python 3.10 packages
-RUN apt-get install -qq -y \
+RUn apt-get install -qq -y \
    python3 \
    python3-click \
    python3-cryptography \
@@ -171,6 +165,7 @@ RUN apt-get install -qq -y \
    python3-dateutil \
    python3-matplotlib \
    python-matplotlib-data \
+   python3-numpy \
    python3-pip \
    python3-psutil \
    python3-pyqt5 \
@@ -194,11 +189,11 @@ RUN ${PYTHON} -m pip install 'ipython>=7.23.1'
 RUN ${PYTHON} -m pip install -e git+https://github.com/Mathics3/mathicsscript#egg=mathicsscript[full]
 RUN (cd src/mathicsscript && make)
 
-##################
-# debug stuff    #
-##################
-RUN apt-get install -y -qq emacs
-RUN pip install trepan3k
+# ##################
+# # debug stuff    #
+# ##################
+# RUN apt-get install -y -qq emacs
+# RUN pip install trepan3k
 # RUN pip install remake
 
 ##################
