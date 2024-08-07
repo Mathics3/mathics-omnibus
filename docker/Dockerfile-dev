@@ -198,6 +198,7 @@ EXPOSE 8000
 
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
 RUN chown -vR ubuntu:ubuntu /usr/src/app/.local/var/mathics/
+RUN chown -vR ubuntu:ubuntu $MATHICS_HOME
 
 USER ubuntu
 
