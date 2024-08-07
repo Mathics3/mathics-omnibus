@@ -56,7 +56,7 @@ done
 $DOCKER run -it \
   --name mathics-doc \
   --rm \
-  --env="DISPLAY" \
+  --env "DISPLAY=$DISPLAY" \
   --workdir=/app \
   --volume="$PWD":/app \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \

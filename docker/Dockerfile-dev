@@ -1,8 +1,8 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 ENV MATHICS_HOME=/usr/src/app
 
-ENV ASY_VERSION=asymptote-2.86
+ENV ASY_VERSION=asymptote-2.87
 ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
 
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
@@ -12,6 +12,21 @@ WORKDIR $MATHICS_HOME
 COPY requirements.txt ./
 RUN apt-get update
 RUN apt-get install -qq apt-utils
+RUN apt-get install -qq software-properties-common wget
+RUN add-apt-repository ppa:deadsnakes/ppa
+
+RUN apt-get update -y && apt-get upgrade -y -qq
+
+# noble usually runs Python 3.12, but we only support up to
+# Python 3.11
+ENV PYTHON=python3.11
+RUN apt-get install -y -qq \
+    ${PYTHON} ${PYTHON}-dev ${PYTHON}-distutils
+
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN ${PYTHON} ./get-pip.py
+
+ENV PIP=/usr/local/bin/pip3.11
 
 # we need libsqlite3-dev now if ubuntu doesn't come with that, we'll need
 # to build our own Python
@@ -20,8 +35,6 @@ RUN apt-get install -qq apt-utils
 # inxi and mesa-utils might be optional
 # npm pulls in nodejs, but we'll be explicit.
 
-RUN apt-get update -y && apt-get upgrade -y -qq
-
 # Install lots of packages
 RUN apt-get install -y -qq \
     cargo \
@@ -29,45 +42,34 @@ RUN apt-get install -y -qq \
     gfortran \
     git x11-apps \
     gyp \
-    latexmk texlive-xetex \
-    libffi7 \
+    latexmk texlive-xetex texlive-fonts-extra texlive-fonts-extra-links \
+    libffi8 \
     libgl1-mesa-dri \
-    libgl1-mesa-glx \
     liblapack-dev \
     libmysqlclient-dev \
     libopenblas-dev \
     libxml2-dev \
+    libxcb-cursor-dev \
     libxslt1-dev \
-    llvm-11 \
-    llvm-11-dev \
-    llvm-12 \
-    llvm-12-dev \
+    llvm-18 \
+    llvm-18-dev \
     lmodern texlive-latex-extra \
     maria \
     mesa-utils \
     nodejs \
     npm \
     pkg-config \
-    python3-pip \
     rustc \
     sqlite3 \
     texlive-fonts-recommended \
     tk8.6-blt2.5 \
     xserver-xorg-video-all
 
-# Set up Pyston
-COPY src/*_amd64.deb /tmp/
-RUN dpkg -i /tmp/*_amd64.deb
-
 # to make docker layers be more usuable in development
 # defer deletion until close to the end
 # RUN rm -fr /tmp*_amd64.deb
 
-ENV PYTHON=python3.10
-ENV PIP=/usr/bin/pip3.10
 RUN $PYTHON -m pip install --upgrade pip
-COPY src/*.py3-none-any.whl src/*x86_64*.whl /tmp/
-RUN $PIP install wheel /tmp/*.py3-none-any.whl /tmp/*x86_64.whl
 RUN $PIP install --no-cache-dir -r requirements.txt
 
 ################
@@ -79,7 +81,7 @@ RUN $PIP install --no-cache-dir -r requirements.txt
 RUN apt-get install -y -qq librsvg2-bin pyqt5-dev-tools
 
 # We need newer versions of Asymptote and GhostScript for bulding the PDF
-RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq freeglut3 libfftw3-double3 libglew2.2 libsigsegv2 ghostscript imagemagick texlive-pstricks
+RUN DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq freeglut3-dev libfftw3-double3 libglew2.2 libsigsegv2 ghostscript imagemagick texlive-pstricks
 COPY ubuntu-bin/gs /usr/local/bin/
 
 #--
@@ -117,8 +119,7 @@ ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
 # COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
 # COPY src/version-info.tex mathics-core/mathics/doc/latex/
 
-# pyston_lite_autoload Works for 3.7 - 3.10 only
-RUN $PIP install -U pyston_lite_autoload numpy SciPy scikit-image
+RUN $PIP install -U 'numpy<1.27' SciPy scikit-image
 
 RUN (cd mathics-core && $PIP install -e .[full])
 RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
@@ -127,10 +128,10 @@ RUN (cd mathics-core && bash ./admin-tools/make-op-tables.sh)
 # Mathics Pymathics and Pymathics Graph for Django #
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-# RUN $PIP install "pymathics-graph>=6.2.0"
+# RUN $PIP install "pymathics-graph>=7.0.0"
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-# RUN $PIP install "pymathics-natlang>=6.2.0"
+# RUN $PIP install "pymathics-natlang>=7.0.0"
 
 RUN $PIP install spacy
 RUN $PYTHON -m spacy download en_core_web_sm
@@ -149,42 +150,19 @@ RUN (cd mathics-django && $PIP install -e .[full])
 RUN (cd mathics-django && make build)
 
 # RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
-# RUN $PYTHON -m pip install "Mathics-Django[full]>=6.2.0"
+# RUN $PYTHON -m pip install "Mathics-Django[full]>=7.0.0"
 
-# RUN (cd src/mathics-django && PIP=$PIP make)
-RUN (cd src/mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
-COPY src/doc_html_data.pcl doc_html_data.pcl
-RUN mkdir -p /usr/src/app/.local/var/mathics && mv -v doc_html_data.pcl /usr/src/app/.local/var/mathics/doc_data_html.pcl
+RUN (cd mathics-django && PIP=$PIP make)
+RUN (cd mathics-django && make doctest-data) || true
+# RUN mkdir -p /usr/src/app/.local/var/mathics && mv -v mathics-core/mathics/doc/doc_html_data.pcl /usr/src/app/.local/var/mathics/doc_data_html.pcl
 
 ##################
 # Mathicsscript  #
 ##################
 
-# Mathicsscript loses functionality with pyston because matplotlib doesn't render
-# images with it
-# Install python 3.10 packages
-RUN apt-get install -qq -y \
-   python3 \
-   python3-click \
-   python3-cryptography \
-   python3-cson \
-   python3-dateutil \
-   python3-matplotlib \
-   python-matplotlib-data \
-   python3-pip \
-   python3-psutil \
-   python3-pyqt5 \
-   python3-pyqt5.qtsvg \
-   python3-setuptools \
-   python3-sympy
-
 COPY requirements-mathicsscript.txt ./
 RUN $PIP install --no-cache-dir -r requirements-mathicsscript.txt
 RUN git clone https://github.com/Mathics3/mathicsscript.git
-RUN (cd mathicsscript && PYTHON=$PYTHON make install)
-
-RUN ${PYTHON} -m spacy download en_core_web_md
-RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
 
 # prompt toolkit needs an IPython that is newer than what got
 # implicitly installed above
@@ -206,24 +184,22 @@ RUN pip install trepan3k
 ##################
 
 # Cleanup
-RUN rm -fr /tmp*_amd64.deb /tmp/*.whl
+RUN rm -fr /tmp*_amd64.deb /tmp/*.whl || true
 
 COPY entrypoint.sh /usr/local/bin/mathics-omnibus.sh
 RUN chmod +x /usr/local/bin/mathics-omnibus.sh
 
 EXPOSE 8000
 
-RUN groupadd mathics && \
-    useradd -d $MATHICS_HOME -g mathics -m -s /bin/bash mathics && \
-    mkdir -p $MATHICS_HOME/data && \
-    chown -R mathics:mathics $MATHICS_HOME
+# RUN groupadd mathics && \
+#     useradd -d $MATHICS_HOME -g mathics -m -s /bin/bash mathics && \
+#     mkdir -p $MATHICS_HOME/data && mkdir $MATHICS_HOME/.config/mathicsscript -p && \
+#     chown -vR mathics:mathics $MATHICS_HOME
 
 COPY django-db/mathics.sqlite /usr/src/app/.local/var/mathics/mathics.sqlite
-run chown -vR mathics:mathics /usr/src/app/.local/var/mathics/mathics.sqlite
-USER mathics
+RUN chown -vR ubuntu:ubuntu /usr/src/app/.local/var/mathics/
 
-RUN ${PYTHON} -m spacy download en_core_web_md
-RUN ${PYTHON} -m nltk.downloader wordnet omw-1.4
+USER ubuntu
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
