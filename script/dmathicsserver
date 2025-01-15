@@ -70,6 +70,7 @@ $DOCKER run \
 		--env="ASYMPTOTE_PDFVIEWER=/usr/bin/evince" \
 		--env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
 		--env "PYTHON=/opt/python3.12/bin/python3.12" \
+		--user=$(id -u) \
 		--workdir=/app \
 		--volume="$PWD":/app \
 		--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
