@@ -128,10 +128,11 @@ done
 $DOCKER run \
 	--rm \
 	--env "DISPLAY=$DISPLAY" \
-	--env "PYTHON=python3" \
+	--env "PYTHON=/opt/python3.12/bin/python3.12" \
 	--env "MPLCONFIGDIR=${MPLCONFIGDIR}" \
 	--name mathics-cli \
 	--tty \
+	--user=$(id -u) \
 	--interactive \
 	--network=host \
 	--volume="$PWD":/app \

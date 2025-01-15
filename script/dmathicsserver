@@ -12,7 +12,7 @@ APP_DATADIR=${APP_DATADIR:-/tmp}
 DOCKER=${DOCKER:-docker}
 ASYMPTOTE_PDFVIEWER=${ASYMPTOTE_PDFVIWER:-/usr/bin/evince}
 MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
-MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics/${MATHICS_DJANGO_DB}}
+MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics3/${MATHICS_DJANGO_DB}}
 TAG=${TAG:-latest}
 
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
@@ -69,7 +69,7 @@ $DOCKER run \
 		--env="DISPLAY" \
 		--env="ASYMPTOTE_PDFVIEWER=/usr/bin/evince" \
 		--env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
-		--env "PYTHON=pyston" \
+		--env "PYTHON=/opt/python3.12/bin/python3.12" \
 		--workdir=/app \
 		--volume="$PWD":/app \
 		--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
