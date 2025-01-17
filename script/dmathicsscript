@@ -137,7 +137,7 @@ $DOCKER run \
 	--network=host \
 	--volume="$PWD":/app \
 	--volume "${APP_DATADIR}:/usr/src/app/data" \
-	--volume "${CONFIGDIR}:/usr/src/app/.config/mathicsscript" \
+	--volume "${CONFIGDIR}:/home/ubuntu/.config/mathicsscript" \
 	$GRAPHICS_DEVICE \
     $MATHICS_IMAGE \
 	--mode cli -- $style ${stripped_args[@]} ${e_args[0]} "${e_args[1]}"

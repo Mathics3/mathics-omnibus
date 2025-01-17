@@ -1,6 +1,6 @@
 FROM ubuntu:24.10
 
-ENV MATHICS3_HOME=/usr/src/app
+ENV MATHICS3_HOME=/home/ubuntu
 
 ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
 
@@ -72,9 +72,23 @@ RUN $PYTHON -m pip install --upgrade pip
 
 RUN git clone --depth 1 https://github.com/Mathics3/mathics-scanner.git
 RUN (cd mathics-scanner && $PIP install -e .[full])
+RUN $PIP install cython
 RUN git clone --depth 1 https://github.com/Mathics3/mathics-core.git
-RUN (cd mathics-core && git submodule init && git submodule update && $PIP install -e .[full])
+RUN (cd mathics-core && git submodule update --init --recursive && $PIP install -e .[full])
 RUN (cd mathics-core && bash ./admin-tools/make-JSON-tables.sh)
+
+#######################################
+# Mathics Pymathics and Pymathics Graph
+#######################################
+
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
+RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
+# # RUN $PIP install "pymathics-natlang>=6.2.0"
+
+RUN $PIP install spacy
+RUN $PYTHON -m spacy download en_core_web_sm
+RUN $PIP install nltk
+RUN $PYTHON -m nltk.downloader wordnet omw-1.4
 
 # # ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
 # # ENV DOCTEST_LATEX_DATA_PCL=/usr/src/app/mathics-core/mathics/doc/latex/doctext_latex_data.pcl
@@ -85,20 +99,6 @@ RUN (cd mathics-core && bash ./admin-tools/make-JSON-tables.sh)
 # # # COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
 # # # COPY src/version-info.tex mathics-core/mathics/doc/latex/
 
-
-####################################################
-# Mathics Pymathics and Pymathics Graph for Django #
-####################################################
-
-RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
-
-# $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-# # RUN $PIP install "pymathics-natlang>=6.2.0"
-
-# RUN $PIP install spacy
-# RUN $PYTHON -m spacy download en_core_web_sm
-# RUN $PIP install nltk
-# RUN $PYTHON -m nltk.downloader wordnet omw-1.4
 
 # # This is a mess. Figure out how to make doc.
 COPY src/mathics.pdf mathics-core/mathics/doc/latex/mathics.pdf
@@ -150,16 +150,14 @@ RUN chmod +x /usr/local/bin/mathics-omnibus.sh
 
 EXPOSE 8000
 
-RUN groupadd mathics3 && \
-    useradd -d $MATHICS3_HOME -g mathics3 -m -s /bin/bash mathics3
 RUN mkdir -p ${MATHICS3_HOME}/.local
 RUN mkdir -p ${MATHICS3_HOME}/.config
 RUN mkdir -p ${MATHICS3_HOME}/data
 RUN mkdir -p ${MATHICS3_HOME}/.local/var/mathics3/Packages
 COPY django-db/mathics.sqlite ${MATHICS3_HOME}/.local/var/mathics3/mathics.sqlite
-RUN chown -R mathics3:mathics3 $MATHICS3_HOME ${MATHICS3_HOME}/.local
-RUN chown -R mathics3:mathics3 ${MATHICS3_HOME}/data
-USER mathics3
+RUN chown -R ubuntu:ubuntu $MATHICS3_HOME ${MATHICS3_HOME}/.local
+RUN chown -R ubuntu:ubuntu ${MATHICS3_HOME}/data
+USER ubuntu
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
 
