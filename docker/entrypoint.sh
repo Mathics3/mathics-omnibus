@@ -2,9 +2,10 @@
 # This is the docker entry point and gets installed as /usr/local/bin/mathics.sh
 
 # DJANGO_DOC_HTML_DATA_PATH="/usr/local/lib/python3.8/dist-packages/mathics_django/doc/doc_html_data.pcl"
-MATHICS_DJANGO_SYSTEM_DB_PATH="/usr/src/app/.local/var/mathics/mathics.sqlite"
+USER_HOME="/home/ubuntu"
+MATHICS_DJANGO_SYSTEM_DB_PATH="${USER_HOME}/.local/var/mathics/mathics.sqlite"
 
-export PATH=/opt/python3.12/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/src/app/.local/bin
+export PATH="/opt/python3.12/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${USER_HOME}/.local/bin"
 
 script_cmd="${ENTRYPOINT_COMMAND:-$(basename $0)}"
 
@@ -62,11 +63,11 @@ case $mathics_mode in
 		mathics $@
 		;;
     document|pdf)
-		evince /usr/src/app/mathics-core/mathics/doc/latex/mathics.pdf
+		evince ${USER_HOME}/mathics-core/mathics/doc/latex/mathics.pdf
 		;;
     copy)
 		echo "Copying mathics.pdf to host-attached filesystem ${TEMPDIR}."
-		cp /usr/src/app/mathics-core/mathics/doc/latex/mathics.pdf /usr/src/app/data/mathics.pdf
+		cp ${USER_HOME}/mathics-core/mathics/doc/latex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
     ui|gui)
 	echo
