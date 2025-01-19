@@ -49,6 +49,7 @@ RUN apt-get install -y -qq \
     pyqt5-dev-tools \
     python3-pip \
     python3.12-venv \
+    remake \
     rustc \
     sqlite3 \
     texlive-fonts-recommended \
@@ -72,21 +73,26 @@ RUN $PYTHON -m pip install --upgrade pip
 
 RUN git clone --depth 1 https://github.com/Mathics3/mathics-scanner.git
 RUN (cd mathics-scanner && $PIP install -e .[full])
-RUN $PIP install cython
+RUN $PIP install cython trepan3k
 RUN git clone --depth 1 https://github.com/Mathics3/mathics-core.git
 RUN (cd mathics-core && git submodule update --init --recursive && $PIP install -e .[full])
 RUN (cd mathics-core && bash ./admin-tools/make-JSON-tables.sh)
 
-#######################################
-# Mathics Pymathics and Pymathics Graph
-#######################################
+##############################################
+# Mathics Modules: Trepan, Graph, and Natlang
+##############################################
+RUN git clone --depth 1 https://github.com/Mathics3/Mathics3-trepan.git
+RUN (cd Mathics3-trepan && $PIP install -e .)
+
+RUN git clone --depth 1 https://github.com/Mathics3/trepan3k-mathics-debugger/
+RUN (cd trepan3k-mathics-debugger && $PIP install -e .)
 
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-graph#egg=pymathics-graph
 RUN $PIP install -e git+https://github.com/Mathics3/pymathics-natlang#egg=pymathics-natlang
-# # RUN $PIP install "pymathics-natlang>=6.2.0"
+# # RUN $PIP install "pymathics-natlang>=8"
 
 RUN $PIP install spacy
-RUN $PYTHON -m spacy download en_core_web_sm
+RUN $PYTHON -m spacy download en_core_web_md
 RUN $PIP install nltk
 RUN $PYTHON -m nltk.downloader wordnet omw-1.4
 
@@ -107,7 +113,7 @@ COPY src/mathics.pdf mathics-core/mathics/doc/latex/mathics.pdf
 ##################
 # Mathics Django #
 ##################
-RUN git clone https://github.com/Mathics3/mathics-django.git
+RUN git clone --depth 1 https://github.com/Mathics3/mathics-django.git
 RUN (cd mathics-django && $PIP install -e .[full])
 # # Get threejs version created
 RUN (cd mathics-django && make build)

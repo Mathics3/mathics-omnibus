@@ -6,6 +6,7 @@ USER_HOME="/home/ubuntu"
 MATHICS_DJANGO_SYSTEM_DB_PATH="${USER_HOME}/.local/var/mathics/mathics.sqlite"
 
 export PATH="/opt/python3.12/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${USER_HOME}/.local/bin"
+export PYTHONBREAKPOINT=trepan.api.debug
 
 script_cmd="${ENTRYPOINT_COMMAND:-$(basename $0)}"
 
@@ -20,9 +21,7 @@ Arg:
     -h | --help               Print this help and exit
 
     --pythonpath              This will be added to PYTHONPATH. Example use-case - absolute path to
-                              basedir of mathics source code inside container, ie:
-                                 mathics src = /usr/src/app/mathics
-                                 --pythonpath /usr/src/app
+                              basedir of mathics source code inside container
 
     -m | --mode {cli|ui|gui|minimal|pdf|copy}
                               Start mathics in either:
@@ -59,7 +58,9 @@ done
 case $mathics_mode in
     cli) mathicsscript $@
 		 ;;
-    minimal|mathics)
+    mathics3-tokens) python ${USER_HOME}/mathics-scanner/mathics_scanner/mathics3_tokens.py $@
+		 ;;
+    minimal|mathics|mathics3)
 		mathics $@
 		;;
     document|pdf)
@@ -69,7 +70,7 @@ case $mathics_mode in
 		echo "Copying mathics.pdf to host-attached filesystem ${TEMPDIR}."
 		cp ${USER_HOME}/mathics-core/mathics/doc/latex/mathics.pdf /usr/src/app/data/mathics.pdf
 		;;
-    ui|gui)
+    django|ui|gui)
 	echo
 	echo "~~~~ app/data has been mounted to $MATHICS_HOME/data ~~~~"
 	if [[ -n $MATHICS_DJANGO_DB_PATH ]]; then
