@@ -96,19 +96,24 @@ RUN $PYTHON -m spacy download en_core_web_md
 RUN $PIP install nltk
 RUN $PYTHON -m nltk.downloader wordnet omw-1.4
 
-# # ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
-# # ENV DOCTEST_LATEX_DATA_PCL=/usr/src/app/mathics-core/mathics/doc/latex/doctext_latex_data.pcl
-# # ENV DOCTEST_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/doc_html_data.pcl
+# ENV DATA_DIR=/usr/src/app/mathics-core/mathics/doc/latex/
+# ENV DOCTEST_LATEX_DATA_PCL=/usr/src/app/mathics-core/mathics/doc/latex/doctext_latex_data.pcl
+# ENV DOCTEST_USER_HTML_DATA_PATH=/usr/src/app/mathics-core/mathics/doc/doc_html_data.pcl
 
-# # COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
-# # ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
-# # # COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
-# # # COPY src/version-info.tex mathics-core/mathics/doc/latex/
+#######################
+# LaTeX/PDF generation
+#######################
+# This has to appear after core and Mathics3 Modules have been built.
+# Making the PDF is very time consuming. For now its is easy to build outside of
+# docker and just copy in.
 
+# RUN (cd mathics-core/mathics/doc/latex && PYTHON=$PYTHON make mathics.pdf) || /bin/true
+# COPY tex-images/*.pdf mathics-core/mathics/doc/latex/
+# ENV DOC_LATEX_FILE=/usr/src/app/mathics-core/mathics/doc/latex/documentation.tex
+# # COPY src/documentation.tex mathics-core/mathics/doc/latex/documentation.tex
+# # COPY src/version-info.tex mathics-core/mathics/doc/latex/
 
-# # This is a mess. Figure out how to make doc.
 COPY src/mathics.pdf mathics-core/mathics/doc/latex/mathics.pdf
-# # RUN (cd mathics-core/mathics/doc/latex && PYTHON=$PYTHON make mathics.pdf) || /bin/true
 
 ##################
 # Mathics Django #
