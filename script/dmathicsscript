@@ -127,6 +127,7 @@ done
 
 $DOCKER run \
 	--rm \
+	--env "COLORFGBG=$COLORFGBG" \
 	--env "DISPLAY=$DISPLAY" \
 	--env "PYTHON=/opt/python3.12/bin/python3.12" \
 	--env "MPLCONFIGDIR=${MPLCONFIGDIR}" \

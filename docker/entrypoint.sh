@@ -1,9 +1,8 @@
 #!/bin/bash
 # This is the docker entry point and gets installed as /usr/local/bin/mathics.sh
 
-# DJANGO_DOC_HTML_DATA_PATH="/usr/local/lib/python3.8/dist-packages/mathics_django/doc/doc_html_data.pcl"
 USER_HOME="/home/ubuntu"
-MATHICS_DJANGO_SYSTEM_DB_PATH="${USER_HOME}/.local/var/mathics/mathics.sqlite"
+MATHICS_DJANGO_SYSTEM_DB_PATH="${USER_HOME}/.local/var/Mathics3/mathics.sqlite"
 
 export PATH="/opt/python3.12/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${USER_HOME}/.local/bin"
 export PYTHONBREAKPOINT=trepan.api.debug

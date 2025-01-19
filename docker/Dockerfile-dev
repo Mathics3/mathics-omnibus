@@ -67,6 +67,13 @@ ENV PYTHON=/opt/python3.12/bin/python3.12
 ENV PIP=/opt/python3.12/bin/pip
 RUN $PYTHON -m pip install --upgrade pip
 
+####################
+# Oour hacked stopit
+####################
+
+RUN git clone --depth 1 https://github.com/Mathics3/stopit.git
+RUN (cd stopit && $PIP install -e .)
+
 # ################
 # # Mathics core #
 # ################
@@ -75,7 +82,11 @@ RUN git clone --depth 1 https://github.com/Mathics3/mathics-scanner.git
 RUN (cd mathics-scanner && $PIP install -e .[full])
 RUN $PIP install cython trepan3k
 RUN git clone --depth 1 https://github.com/Mathics3/mathics-core.git
-RUN (cd mathics-core && git submodule update --init --recursive && $PIP install -e .[full])
+# For reasons I don't understand, "submodule init" only adds the first repository.
+# We need to add the second repository Rubi, explicitly
+RUN (cd mathics-core && git submodule update --init --recursive && \
+    git submodule add https://github.com/Mathics3/Mathics3-Rubi.git mathics/Packages/Rubi)
+RUN (cd mathics-core && git submodule && $PIP install -e .[full])
 RUN (cd mathics-core && bash ./admin-tools/make-JSON-tables.sh)
 
 ##############################################
@@ -122,14 +133,13 @@ RUN git clone --depth 1 https://github.com/Mathics3/mathics-django.git
 RUN (cd mathics-django && $PIP install -e .[full])
 # # Get threejs version created
 RUN (cd mathics-django && make build)
-
 # # RUN $PYTHON -m pip install -e git+https://github.com/Mathics3/mathics-django#egg=Mathics-Django[full]
-# # RUN $PYTHON -m pip install "Mathics-Django[full]>=6.2.0"
+# # RUN $PYTHON -m pip install "Mathics-Django[full]>=7.0.0"
 
 # # RUN (cd src/mathics-django && PIP=$PIP make)
-RUN (cd mathics-django && $PYTHON mathics_django/docpipeline.py -ok --want-sorting) || true
+# RUN (cd mathics-django && $PYTHON mathics_django/docpipeline.py -ok) || true
 COPY src/doc_html_data.pcl doc_html_data.pcl
-RUN mkdir -p /usr/src/app/.local/var/mathics && mv -v doc_html_data.pcl /usr/src/app/.local/var/mathics/doc_data_html.pcl
+RUN mv -v doc_html_data.pcl /home/ubuntu/mathics-django/mathics_django/doc/doc_data_html.pcl
 
 ##################
 # Mathicsscript  #
@@ -164,8 +174,8 @@ EXPOSE 8000
 RUN mkdir -p ${MATHICS3_HOME}/.local
 RUN mkdir -p ${MATHICS3_HOME}/.config
 RUN mkdir -p ${MATHICS3_HOME}/data
-RUN mkdir -p ${MATHICS3_HOME}/.local/var/mathics3/Packages
-COPY django-db/mathics.sqlite ${MATHICS3_HOME}/.local/var/mathics3/mathics.sqlite
+RUN mkdir -p ${MATHICS3_HOME}/.local/var/Mathics3/Packages
+COPY django-db/mathics.sqlite ${MATHICS3_HOME}/.local/var/Mathics3/mathics.sqlite
 RUN chown -R ubuntu:ubuntu $MATHICS3_HOME ${MATHICS3_HOME}/.local
 RUN chown -R ubuntu:ubuntu ${MATHICS3_HOME}/data
 USER ubuntu

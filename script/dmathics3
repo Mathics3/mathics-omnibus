@@ -54,8 +54,11 @@ for env_setting in MATHICS_IMAGE; do
 done
 
 
-$DOCKER run --rm -it \
-		--name mathics-cli \
-		--volume /tmp:/usr/src/app/data \
-		$MATHICS_IMAGE \
-		--mode mathics -- $@
+$DOCKER run \
+	--rm \
+	-it \
+	--env "COLORFGBG=$COLORFGBG" \
+	--name mathics-cli \
+	--volume /tmp:/usr/src/app/data \
+	$MATHICS_IMAGE \
+	--mode mathics -- $@

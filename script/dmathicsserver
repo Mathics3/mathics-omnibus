@@ -5,18 +5,18 @@ if [ -n "$DEBUG" ]; then
 fi
 
 # The release name we are configured to run under.
-typeset dmathicsserver_version='1.0.0'
+typeset dmathicsserver_version='2.0.0'
 
 # Allow customization using POSIX environment variables:
 APP_DATADIR=${APP_DATADIR:-/tmp}
 DOCKER=${DOCKER:-docker}
 ASYMPTOTE_PDFVIEWER=${ASYMPTOTE_PDFVIWER:-/usr/bin/evince}
+USER_HOME="/home/ubuntu"
 MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
-MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/home/ubuntu/.local/var/mathics3/${MATHICS_DJANGO_DB}}
+MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-${USER_HOME}/.local/var/Mathics3/${MATHICS_DJANGO_DB}}
 TAG=${TAG:-latest}
 
 MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
-USER_HOME="/home/ubuntu"
 
 typeset -a stripped_args
 stripped_args=()
@@ -67,6 +67,7 @@ $DOCKER run \
 		-it \
 		--name mathics-django \
 		--rm \
+		--env "COLORFGBG=$COLORFGBG" \
 		--env="DISPLAY" \
 		--env="ASYMPTOTE_PDFVIEWER=/usr/bin/evince" \
 		--env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
