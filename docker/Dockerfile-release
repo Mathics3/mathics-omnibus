@@ -67,7 +67,11 @@ RUN pip install Mathics3
 RUN pip install mathicsscript
 RUN pip install Mathics-Django
 RUN pip install pymathics-graph
-RUN pip install Mathics3-trepan
+
+RUN git clone --depth 1 https://github.com/Mathics3/Mathics3-trepan.git
+RUN (cd Mathics3-trepan && $PIP install -e .)
+
+RUN pip install trepan3k-mathics3
 
 RUN $PIP install spacy wordcloud
 RUN $PYTHON -m spacy download en_core_web_md
@@ -86,7 +90,6 @@ RUN mkdir -p ${MATHICS3_HOME}/data
 RUN mkdir -p ${MATHICS3_HOME}/.local/var/Mathics3/Packages
 COPY django-db/mathics.sqlite ${MATHICS3_HOME}/.local/var/Mathics3/mathics.sqlite
 RUN chown -R ubuntu:ubuntu $MATHICS3_HOME ${MATHICS3_HOME}/.local
-RUN chown -R ubuntu:ubuntu ${MATHICS3_HOME}/data
 USER ubuntu
 
 ENTRYPOINT ["/usr/local/bin/mathics-omnibus.sh"]
