@@ -1,0 +1,77 @@
+--- ChangeLog	2025-01-28 08:11:48.318713212 -0500
++++ ChangeLog-spell-corrected	2025-01-28 08:12:51.006747114 -0500
+@@ -36,7 +36,7 @@
+ 
+ 2025-01-17  rocky <rb@dustyfeet.com>
+ 
+-	* docker/entrypoint.sh, script/dmathicsserver: mathicsdoc corretions
++	* docker/entrypoint.sh, script/dmathicsserver: mathicsdoc corrections
+ 	for USER_HOME=/home/ubuntu
+ 
+ 2025-01-16  rocky <rb@dustyfeet.com>
+@@ -76,7 +76,7 @@
+ 
+ 2024-01-17  rocky <rb@dustyfeet.com>
+ 
+-	* docker/Dockerfile, docker/Dockerfile-dev, docker/Dockerfile-git: 
++	* docker/Dockerfile, docker/Dockerfile-dev, docker/Dockerfile-git:
+ 	Use newer software versions in dev dockerfile
+ 
+ 2024-01-15  rocky <rb@dustyfeet.com>
+@@ -163,7 +163,7 @@
+ 
+ 2022-07-17  rocky <rb@dustyfeet.com>
+ 
+-	* docker/Dockerfile, docker/requirements.txt, script/dmathicsscript: 
++	* docker/Dockerfile, docker/requirements.txt, script/dmathicsscript:
+ 	Everything roughly working again.  * dmathicsscript * dmathicsserver * dmathicsdoc * dmathicsdoccopy However there are still some small rough edges
+ 
+ 2022-07-16  rocky <rb@dustyfeet.com>
+@@ -251,7 +251,7 @@
+ 
+ 2021-09-12  rocky <rb@dustyfeet.com>
+ 
+-	* : Add plots to Parital Diff Eqns 2.1
++	* : Add plots to Partial Diff Eqns 2.1
+ 
+ 2021-09-11  rocky <rb@dustyfeet.com>
+ 
+@@ -300,7 +300,7 @@
+ 2021-08-08  rocky <rb@dustyfeet.com>
+ 
+ 	* script/dmathicsscript, script/dmathicsserver,
+-	script/term-background.sh: Better persistance via setting Env
++	script/term-background.sh: Better persistence via setting Env
+ 	variables Better help for dmathicsscript and dmathicssserver Fix bug in term-background Revise symja example in mathics.sqlite
+ 
+ 2021-08-03  rocky <rb@dustyfeet.com>
+@@ -336,7 +336,7 @@
+ 
+ 	* README.rst, __pkginfo__.py, docker/Dockerfile,
+ 	docker/Dockerfile-dev, docker/Dockerfile-dev+debug,
+-	docker/entrypoint.sh, script/dmathicsdoc, script/dmathicsdoccopy: 
++	docker/entrypoint.sh, script/dmathicsdoc, script/dmathicsdoccopy:
+ 	Revise docker to allow PDF viewing and copy New scripts dmathicsdoc and dmathicsdoccopy perform the new
+ 	functions Document this in README.rst, and add these scripts in PyPI
+ 	packaging.  entrypoint.sh needs to multiplex dmathicsdoccpy and
+@@ -647,7 +647,7 @@
+ 2021-02-20  rocky <rb@dustyfeet.com>
+ 
+ 	* .gitignore, README.rst, admin-tools/git2cl,
+-	admin-tools/make-dist.sh, admin-tools/pyenv-versions, setup.py: 
++	admin-tools/make-dist.sh, admin-tools/pyenv-versions, setup.py:
+ 	Administrivia
+ 
+ 2021-02-20  R. Bernstein <rocky@users.noreply.github.com>
+@@ -1912,10 +1912,9 @@
+ 	mathics/web/templates/base_html.html, mathics/web/urls.py,
+ 	mathics/web/views.py, pymathics/natlang/natlang.py, setup.py,
+ 	test/test_evaluation.py, test/test_file.py,
+-	test/test_parser/test_tokeniser.py, tmp/README.rst, travis.py: 
++	test/test_parser/test_tokeniser.py, tmp/README.rst, travis.py:
+ 	Squash unrelated Docker items
+ 
+ 2020-12-25  rocky <rb@dustyfeet.com>
+ 
+ 	* Initial
+-

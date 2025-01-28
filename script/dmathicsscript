@@ -39,7 +39,7 @@ touch $XAUTH
 
 # Docker mathics contianer we use.
 # Note: has to come af we set after TAG
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+MATHICS3_IMAGE=${MATHICS3_IMAGE:-mathicsorg/mathics:${TAG}}
 
 
 # end customization section
@@ -83,8 +83,8 @@ Useful Environment Variables:
 APP_DATADIR: where application data should be saved. The default is: ${APP_DATADIR}
 DOCKER: the name of the docker program to run. The default is: ${DOCKER}
 CONFIGDIR: directory where Mathics command history is saved. The default is: ${CONFIGDIR}
-MATHICS_IMAGE: Mathics image to use. The default is: ${MATHICS_IMAGE}
-TAG: tag used in MATHICS_IMAGE above. The default is: ${TAG}
+MATHICS3_IMAGE: Mathics image to use. The default is: ${MATHICS3_IMAGE}
+TAG: tag used in MATHICS3_IMAGE above. The default is: ${TAG}
 XAUTH: .Xauthority file. The default is: ${XAUTH}
 
 We will now pass help along to the docker image. Just a sec...
@@ -93,7 +93,7 @@ _EOH
 		stripped_args+=("--help")
 		;;
         -u | -U | --upgrade | upgrade)
-		$DOCKER pull $MATHICS_IMAGE
+		$DOCKER pull $MATHICS3_IMAGE
 		exit $?
 		;;
         -v | -V | --version)
@@ -121,22 +121,24 @@ else
 fi
 
 # Show environment variables
-for env_setting in CONFIGDIR APP_DATADIR MATHICS_IMAGE DISPLAY; do
+for env_setting in CONFIGDIR APP_DATADIR MATHICS3_IMAGE DISPLAY; do
 	echo $env_setting = ${!env_setting}
 done
 
 $DOCKER run \
 	--rm \
+	--env "COLORFGBG=$COLORFGBG" \
 	--env "DISPLAY=$DISPLAY" \
-	--env "PYTHON=python3" \
+	--env "PYTHON=/opt/python3.12/bin/python3.12" \
 	--env "MPLCONFIGDIR=${MPLCONFIGDIR}" \
 	--name mathics-cli \
 	--tty \
+	--user=$(id -u) \
 	--interactive \
 	--network=host \
 	--volume="$PWD":/app \
 	--volume "${APP_DATADIR}:/usr/src/app/data" \
-	--volume "${CONFIGDIR}:/usr/src/app/.config/mathicsscript" \
+	--volume "${CONFIGDIR}:/home/ubuntu/.config/mathicsscript" \
 	$GRAPHICS_DEVICE \
-    $MATHICS_IMAGE \
+    $MATHICS3_IMAGE \
 	--mode cli -- $style ${stripped_args[@]} ${e_args[0]} "${e_args[1]}"

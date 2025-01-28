@@ -5,17 +5,18 @@ if [ -n "$DEBUG" ]; then
 fi
 
 # The release name we are configured to run under.
-typeset dmathicsserver_version='1.0.0'
+typeset dmathicsserver_version='2.0.0'
 
 # Allow customization using POSIX environment variables:
 APP_DATADIR=${APP_DATADIR:-/tmp}
 DOCKER=${DOCKER:-docker}
 ASYMPTOTE_PDFVIEWER=${ASYMPTOTE_PDFVIWER:-/usr/bin/evince}
+USER_HOME="/home/ubuntu"
 MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
-MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-/usr/src/app/.local/var/mathics/${MATHICS_DJANGO_DB}}
+MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-${USER_HOME}/.local/var/Mathics3/${MATHICS_DJANGO_DB}}
 TAG=${TAG:-latest}
 
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+MATHICS3_IMAGE=${MATHICS3_IMAGE:-mathicsorg/mathics:${TAG}}
 
 typeset -a stripped_args
 stripped_args=()
@@ -46,7 +47,7 @@ _EOH
 			stripped_args+=("--help")
 			;;
         -u | -U | --upgrade | upgrade)
-			$DOCKER pull $MATHICS_IMAGE
+			$DOCKER pull $MATHICS3_IMAGE
 			;;
         -v | -V | --version)
 			echo "dmathicsserver version ${dmathicsserver_version}"
@@ -58,7 +59,7 @@ _EOH
 done
 
 # Show environment variables
-for env_setting in MATHICS_DJANGO_DB_PATH APP_DATADIR MATHICS_IMAGE DISPLAY; do
+for env_setting in MATHICS_DJANGO_DB_PATH APP_DATADIR MATHICS3_IMAGE DISPLAY; do
 	echo $env_setting = ${!env_setting}
 done
 
@@ -66,14 +67,16 @@ $DOCKER run \
 		-it \
 		--name mathics-django \
 		--rm \
+		--env "COLORFGBG=$COLORFGBG" \
 		--env="DISPLAY" \
 		--env="ASYMPTOTE_PDFVIEWER=/usr/bin/evince" \
 		--env "MATHICS_DJANGO_DB_PATH=$MATHICS_DJANGO_DB_PATH" \
-		--env "PYTHON=pyston" \
+		--env "PYTHON=/opt/python3.12/bin/python3.12" \
+		--user=$(id -u) \
 		--workdir=/app \
 		--volume="$PWD":/app \
 		--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 		--volume="${APP_DATADIR}:/usr/src/app/data" \
 		-p 8000:8000 \
-		$MATHICS_IMAGE \
+		$MATHICS3_IMAGE \
 		--mode ui -- $stripped_args
