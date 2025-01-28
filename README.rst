@@ -1,8 +1,8 @@
 |Pypi Installs| |Latest Version| |Supported Python Versions|
 
-Mathics is a general-purpose computer algebra system (CAS). It is an open-source alternative to Mathematica. It is free both as in "freedom" and as in "free beer".
+Mathics3 is a general-purpose computer algebra system (CAS). It is an open-source alternative to Mathematica. It is free both as in "freedom" and as in "free beer".
 
-`Mathics <https://mathics.org>`_ consists of a number of separable components so that those pieces that are desired can be used without the burden of dependencies of the other parts.
+`Mathics3 <https://mathics.org>`_ consists of a number of separable components so that those pieces that are desired can be used without the burden of dependencies of the other parts.
 
 For example if you are interested in just running a command-line interface, you might not be interested in having Django and what that entails and vice versa.
 If you are just interested in the computational library, there is no need for either the Web parts or the command-line library parts.
@@ -11,6 +11,7 @@ But what if you want both command-line interface, Web interface, all of the Pyma
 
 That's what this repository is about. Here we have a PyPI installable package that pull in the various components and offer commands:
 
+* ``mathics3-tokens`` utility to show how an input stream is tokenized by Mathics3
 * ``mathicsscript`` to run the command-line interface,
 * ``mathicsserver`` to run the Django-Web server,
 * ``dmathicsscript`` and ``dmathicsserver`` which runs the docker version of these,
@@ -46,7 +47,7 @@ By default, we use a SQLite database that has examples that you can
 load and use. This data comes from
 `mathics-omnibus/django-db/mathics.sqlite <https://github.com/Mathics3/mathics-omnibus/tree/master/docker/django-db>`_.
 
-Since this is tied to the docker image, any changes made won't survice
+Since this is tied to the docker image, any changes made won't survive
 across restarting the docker image.
 
 If you would like to save your own you can set the environment
