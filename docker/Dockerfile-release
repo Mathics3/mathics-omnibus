@@ -2,7 +2,7 @@ FROM ubuntu:24.10
 
 ENV MATHICS3_HOME=/home/ubuntu
 ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
-ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
+ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang,pymathics.trepan"
 
 WORKDIR $MATHICS3_HOME
 
@@ -10,8 +10,6 @@ COPY entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 RUN apt-get update
 RUN apt-get install -qq apt-utils
-
-RUN apt-get update -y && apt-get upgrade -y -qq
 
 RUN apt-get update -y && apt-get upgrade -y -qq
 
@@ -63,15 +61,17 @@ RUN mv -v doc_html_data.pcl ${MATHICS3_HOME}/.local/var/Mathics3/doc_data_html.p
 RUN mkdir -p ${MATHICS3_HOME}/mathics-core/mathics/doc/latex
 COPY src/mathics.pdf mathics-core/mathics/doc/latex/mathics.pdf
 
-RUN pip install Mathics3
-RUN pip install mathicsscript
-RUN pip install Mathics-Django
-RUN pip install pymathics-graph
+RUN $PIP install Mathics3
+RUN $PIP install PyQt6
+RUN $PIP install mathicsscript
+RUN $PIP install Mathics-Django
+RUN $PIP install pymathics-graph
+RUN $PIP install Mathics3-trepan
 
-RUN git clone --depth 1 https://github.com/Mathics3/Mathics3-trepan.git
-RUN (cd Mathics3-trepan && $PIP install -e .)
+# RUN git clone --depth 1 https://github.com/Mathics3/Mathics3-trepan.git
+# RUN (cd Mathics3-trepan && $PIP install -e .)
 
-RUN pip install trepan3k-mathics3
+RUN $PIP install trepan3k-mathics3
 
 RUN $PIP install spacy wordcloud
 RUN $PYTHON -m spacy download en_core_web_md
