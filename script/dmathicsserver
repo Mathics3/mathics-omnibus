@@ -16,7 +16,7 @@ MATHICS_DJANGO_DB=${MATHICS_DJANGO_DB:-"mathics.sqlite"}
 MATHICS_DJANGO_DB_PATH=${MATHICS_DJANGO_DB_PATH:-${USER_HOME}/.local/var/Mathics3/${MATHICS_DJANGO_DB}}
 TAG=${TAG:-latest}
 
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+MATHICS3_IMAGE=${MATHICS3_IMAGE:-mathicsorg/mathics:${TAG}}
 
 typeset -a stripped_args
 stripped_args=()
@@ -47,7 +47,7 @@ _EOH
 			stripped_args+=("--help")
 			;;
         -u | -U | --upgrade | upgrade)
-			$DOCKER pull $MATHICS_IMAGE
+			$DOCKER pull $MATHICS3_IMAGE
 			;;
         -v | -V | --version)
 			echo "dmathicsserver version ${dmathicsserver_version}"
@@ -59,7 +59,7 @@ _EOH
 done
 
 # Show environment variables
-for env_setting in MATHICS_DJANGO_DB_PATH APP_DATADIR MATHICS_IMAGE DISPLAY; do
+for env_setting in MATHICS_DJANGO_DB_PATH APP_DATADIR MATHICS3_IMAGE DISPLAY; do
 	echo $env_setting = ${!env_setting}
 done
 
@@ -78,5 +78,5 @@ $DOCKER run \
 		--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 		--volume="${APP_DATADIR}:/usr/src/app/data" \
 		-p 8000:8000 \
-		$MATHICS_IMAGE \
+		$MATHICS3_IMAGE \
 		--mode ui -- $stripped_args

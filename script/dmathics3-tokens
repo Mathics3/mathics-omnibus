@@ -11,10 +11,10 @@ typeset dmathics_version='1.0.0'
 DOCKER=${DOCKER:-docker}
 
 TAG=${TAG:-latest}
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+MATHICS3_IMAGE=${MATHICS3_IMAGE:-mathicsorg/mathics:${TAG}}
 
 # Show environment variables
-for env_setting in MATHICS_IMAGE; do
+for env_setting in MATHICS3_IMAGE; do
 	echo $env_setting = ${!env_setting}
 done
 
@@ -22,5 +22,5 @@ done
 $DOCKER run --rm -it \
 		--name mathics-cli \
 		--volume /tmp:/usr/src/app/data \
-		$MATHICS_IMAGE \
+		$MATHICS3_IMAGE \
 		--mode mathics3-tokens -- $@

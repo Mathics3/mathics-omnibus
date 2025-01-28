@@ -4,7 +4,7 @@ ENV MATHICS3_HOME=/home/ubuntu
 
 ENV MATHICS3_MODULE_OPTION="--load-module pymathics.graph,pymathics.natlang"
 
-ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS_IMAGE}"
+ENV ENTRYPOINT_COMMAND="docker run -it {MATHICS3_IMAGE}"
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 WORKDIR $MATHICS3_HOME
 

@@ -11,7 +11,7 @@ typeset dmathicsdoc_version='1.0.0'
 DOCKER=${DOCKER:-docker}
 
 TAG=${TAG:-latest}
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+MATHICS3_IMAGE=${MATHICS3_IMAGE:-mathicsorg/mathics:${TAG}}
 
 for arg in "$@" ; do
     case "$arg" in
@@ -37,7 +37,7 @@ _EOH
 			exit 101
 			;;
         -u | -U | --upgrade | upgrade)
-			$DOCKER pull $MATHICS_IMAGE
+			$DOCKER pull $MATHICS3_IMAGE
 			;;
         -v | -V | --version)
 			echo "dmathicsdoc version ${dmathicsdoc_version}"
@@ -49,7 +49,7 @@ _EOH
 done
 
 # Show environment variables
-for env_setting in MATHICS_IMAGE DISPLAY; do
+for env_setting in MATHICS3_IMAGE DISPLAY; do
 	echo $env_setting = ${!env_setting}
 done
 
@@ -61,5 +61,5 @@ $DOCKER run -it \
   --volume="$PWD":/app \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
   --volume="/tmp:/usr/src/app/data" \
-  $MATHICS_IMAGE \
+  $MATHICS3_IMAGE \
   --mode pdf -- $@

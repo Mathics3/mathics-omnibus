@@ -41,11 +41,11 @@ for field in "mathics_core_full mathicsscript_full".split():
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
 install_requires = [
-    "Mathics3 > 7.0.0",
-    "mathicsscript >= 7.0.0",
-    "Mathics-Django >= 7.0.0",
-    "pymathics-natlang >= 7.0.0",
-    "pymathics-graph >= 7.0.0",
+    "Mathics3 >= 8.0.0",
+    "mathicsscript >= 8.0.0",
+    "Mathics-Django >= 8.0.0",
+    "pymathics-natlang >= 8.0.0",
+    "pymathics-graph >= 8.0.0",
 ]
 
 packages = ["mathics_omnibus", "script"]

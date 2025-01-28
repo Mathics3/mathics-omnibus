@@ -9,12 +9,12 @@ DOCKER=${DOCKER:-docker}
 TEMPDIR=${TMPDIR:-/tmp}
 
 TAG=${TAG:-latest}
-MATHICS_IMAGE=${MATHICS_IMAGE:-mathicsorg/mathics:${TAG}}
+MATHICS3_IMAGE=${MATHICS3_IMAGE:-mathicsorg/mathics:${TAG}}
 
 for arg in "$@" ; do
     case "$arg" in
         -u | -U | --upgrade | upgrade)
-			$DOCKER pull $MATHICS_IMAGE
+			$DOCKER pull $MATHICS3_IMAGE
 			exit $?
 			;;
         -h | --help | help )
@@ -34,13 +34,13 @@ Options specfic to dmathicsscript:
 Useful Environment Variables:
 
 DOCKER: the name of the docker program to run. The default is: ${DOCKER}
-MATHICS_IMAGE: Mathics image to use. The default is: ${MATHICS_IMAGE}
-TAG: tag used in MATHICS_IMAGE above. The default is: ${TAG}
+MATHICS3_IMAGE: Mathics image to use. The default is: ${MATHICS3_IMAGE}
+TAG: tag used in MATHICS3_IMAGE above. The default is: ${TAG}
 XAUTH: .Xauthority file. The default is: ${XAUTH}
 _EOH
 		exit 0 ;;
         -u | -U | --upgrade | upgrade)
-			$DOCKER pull $MATHICS_IMAGE
+			$DOCKER pull $MATHICS3_IMAGE
 			;;
     esac
 done
@@ -52,5 +52,5 @@ $DOCKER run -it \
   --workdir=/app \
   --volume="$PWD":/app \
   --volume="${TEMPDIR}:/usr/src/app/data" \
-  $MATHICS_IMAGE \
+  $MATHICS3_IMAGE \
   --mode copy -- $@
