@@ -8,6 +8,7 @@
 .vscode
 /.cache
 /.python-version
+/ChangeLog-spell-corrected
 /Mathics_omnibus.egg-info
 /__pycache__
 /build
