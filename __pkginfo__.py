@@ -44,6 +44,7 @@ install_requires = [
     "Mathics3 >= 8.0.0",
     "mathicsscript >= 8.0.0",
     "Mathics-Django >= 8.0.0",
+    "Mathics3-Trepan >= 1.0.2",
     "pymathics-natlang >= 8.0.0",
     "pymathics-graph >= 8.0.0",
 ]

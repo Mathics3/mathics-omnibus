@@ -1,3 +1,14 @@
+8.0.0
+-----
+
+Jan 28, 2025
+
+* Synchronize version number up with major API release in Mathics Kernel
+* Add `dmathics3-tokens` interface to `mathics3-tokens` (from mathics-scanner)
+* Use newer versions of everything, Ubuntu, Python, SymPy, etc.
+* Remove lots of copies of old wheels from source; we can now get everything resonably fast from inside docker
+
+
 4.0.1
 -----
 
